@@ -68,9 +68,13 @@ export interface Recordatorio {
   hasta?: string
 }
 
+/** Qué tanto de la casa se ve en la pantalla de Hoy. */
+export type Vista = 'mias' | 'mias_y_ambos' | 'todas'
+
 export interface Estado {
   version: number
   yo: MiembroId
+  vista: Vista
   plantillas: Plantilla[]
   tareas: Tarea[]
   eventos: Evento[]

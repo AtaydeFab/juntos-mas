@@ -1,9 +1,9 @@
-import { useMemo } from 'react'
-import { useEstado, palomear } from '../store'
+import { useMemo, useState } from 'react'
+import { useEstado, palomear, cambiarVista } from '../store'
 import { FilaTarea, responsableEfectivo } from '../componentes'
-import { faltan, fechaLarga, hoy, proximaFecha, semanaDe, ymd, desdeYmd, fechaCorta } from '../dates'
+import { faltan, fechaLarga, hoy, proximaFecha, semanaDe, ymd, desdeYmd, mesCorto } from '../dates'
 import { miembro } from '../seed'
-import type { Tarea } from '../types'
+import type { Tarea, Vista } from '../types'
 
 function detalleDe(t: Tarea): string {
   const partes: string[] = []
@@ -15,33 +15,37 @@ function detalleDe(t: Tarea): string {
   return partes.join(' · ')
 }
 
+const VISTAS: { id: Vista; nombre: string }[] = [
+  { id: 'mias', nombre: 'Solo mías' },
+  { id: 'mias_y_ambos', nombre: '+ de los dos' },
+  { id: 'todas', nombre: 'Toda la casa' },
+]
+
 export default function Hoy() {
   const estado = useEstado()
   const hoyD = hoy()
   const claveHoy = ymd(hoyD)
   const semana = semanaDe(hoyD)
 
-  const delDia = useMemo(
-    () => estado.tareas.filter(t => t.fecha === claveHoy),
-    [estado.tareas, claveHoy],
-  )
+  const delDia = useMemo(() => estado.tareas.filter(t => t.fecha === claveHoy), [estado.tareas, claveHoy])
   const flexibles = useMemo(
     () => estado.tareas.filter(t => t.fecha === null && t.semana === semana),
     [estado.tareas, semana],
   )
 
-  const mias = delDia.filter(t => {
+  const visible = (t: Tarea) => {
     const r = responsableEfectivo(t)
-    return r === estado.yo || r === 'ambos'
-  })
-  const delOtro = delDia.filter(t => !mias.includes(t))
+    if (estado.vista === 'todas') return true
+    if (r === 'ambos') return estado.vista === 'mias_y_ambos'
+    return r === estado.yo
+  }
 
-  const hechas = delDia.filter(t => t.hecha).length
+  const lista = delDia.filter(visible)
+  const flexiblesVisibles = flexibles.filter(visible)
+  const ocultas = delDia.length - lista.length
+  const hechas = lista.filter(t => t.hecha).length
 
   const recordatoriosMios = estado.recordatorios.filter(r => r.para === estado.yo)
-  const recordatorioDeHoy = recordatoriosMios.length
-    ? recordatoriosMios[hoyD.getDate() % recordatoriosMios.length]
-    : null
 
   const proximos = useMemo(() => {
     return estado.eventos
@@ -60,11 +64,8 @@ export default function Hoy() {
         <span className="sub">{fechaLarga(hoyD)}</span>
       </header>
 
-      {recordatorioDeHoy && (
-        <div className="recordatorio">
-          <span className="k">Acuérdate</span>
-          <p>«{recordatorioDeHoy.texto}»</p>
-        </div>
+      {recordatoriosMios.length > 0 && (
+        <Recordatorio textos={recordatoriosMios.map(r => r.texto)} dia={hoyD.getDate()} />
       )}
 
       {proximos.length > 0 && (
@@ -72,12 +73,16 @@ export default function Hoy() {
           <div className="seccion"><span>Lo que viene</span></div>
           {proximos.map(e => {
             const d = faltan(e.prox)
+            const f = desdeYmd(e.prox)
             return (
               <div key={e.id} className={`evento ${d <= 2 ? 'pronto' : ''}`}>
-                <span className="fecha"><b>{desdeYmd(e.prox).getDate()}</b>{fechaCorta(desdeYmd(e.prox)).split(' ')[1]}</span>
+                <span className="fecha"><b>{f.getDate()}</b>{mesCorto(f)}</span>
                 <span className="txt">
                   <b>{e.titulo}</b>
-                  <small>{d === 0 ? 'hoy' : d === 1 ? 'mañana' : `en ${d} días`}{e.hora ? ` · ${e.hora}` : ''}{e.lugar ? ` · ${e.lugar}` : ''}</small>
+                  <small>
+                    {d === 0 ? 'hoy' : d === 1 ? 'mañana' : `en ${d} días`}
+                    {e.hora ? ` · ${e.hora}` : ''}{e.lugar ? ` · ${e.lugar}` : ''}
+                  </small>
                 </span>
                 {e.anual && <span className="etiqueta">cada año</span>}
               </div>
@@ -87,31 +92,60 @@ export default function Hoy() {
       )}
 
       <div className="seccion">
-        <span>Lo mío</span>
-        <span>{hechas} de {delDia.length} hechas hoy</span>
+        <span>Tareas de hoy</span>
+        <span>{hechas} de {lista.length} hechas</span>
       </div>
-      {mias.length === 0 && <p className="vacio">Hoy no tienes nada. Disfrútalo.</p>}
-      {mias.map(t => (
+
+      <div className="chips" style={{ marginBottom: 12 }}>
+        {VISTAS.map(v => (
+          <button key={v.id} type="button" className={`chip ${estado.vista === v.id ? 'on' : ''}`}
+            onClick={() => cambiarVista(v.id)}>{v.nombre}</button>
+        ))}
+      </div>
+
+      {lista.length === 0 && <p className="vacio">Nada pendiente aquí. Disfrútalo.</p>}
+      {lista.map(t => (
         <FilaTarea key={t.id} tarea={t} detalle={detalleDe(t)} onPalomear={() => palomear(t.id, estado.yo)} />
       ))}
 
-      {flexibles.length > 0 && (
+      {ocultas > 0 && (
+        <p className="nota aviso-ocultas">
+          Hay {ocultas} {ocultas === 1 ? 'tarea' : 'tareas'} de los demás sin mostrar.<br />
+          <button type="button" className="enlace" onClick={() => cambiarVista('todas')}>Ver toda la casa</button>
+        </p>
+      )}
+
+      {flexiblesVisibles.length > 0 && (
         <>
           <div className="seccion"><span>De esta semana, cuando puedan</span></div>
-          {flexibles.map(t => (
+          {flexiblesVisibles.map(t => (
             <FilaTarea key={t.id} tarea={t} detalle="elige tú el día" onPalomear={() => palomear(t.id, estado.yo)} />
           ))}
         </>
       )}
-
-      {delOtro.length > 0 && (
-        <>
-          <div className="seccion"><span>De los demás</span></div>
-          {delOtro.map(t => (
-            <FilaTarea key={t.id} tarea={t} detalle={detalleDe(t)} onPalomear={() => palomear(t.id, estado.yo)} />
-          ))}
-        </>
-      )}
     </>
+  )
+}
+
+/** Uno a la vez: cambia solo cada día, y se puede pasar de uno a otro a mano. */
+function Recordatorio({ textos, dia }: { textos: string[]; dia: number }) {
+  const [desplazado, setDesplazado] = useState(0)
+  const i = ((dia + desplazado) % textos.length + textos.length) % textos.length
+
+  return (
+    <div className="recordatorio">
+      <div className="recordatorio-cab">
+        <span className="k">Acuérdate</span>
+        {textos.length > 1 && (
+          <span className="pasar">
+            <button type="button" aria-label="Recordatorio anterior" onClick={() => setDesplazado(d => d - 1)}>‹</button>
+            <span className="k">{i + 1} de {textos.length}</span>
+            <button type="button" aria-label="Siguiente recordatorio" onClick={() => setDesplazado(d => d + 1)}>›</button>
+          </span>
+        )}
+      </div>
+      <p>«{textos[i]}»</p>
+      {textos.length > 1 && <span className="k" style={{ opacity: 0.75 }}>Cambia solo cada día</span>}
+    </div>
   )
 }

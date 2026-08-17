@@ -238,6 +238,33 @@ h1, h2, h3 { font-family: var(--display); font-weight: 600; margin: 0; letter-sp
   color: var(--sa);
 }
 .recordatorio p { font-family: var(--display); font-size: 17px; margin: 0; line-height: 1.3; }
+.recordatorio-cab { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+.pasar { display: flex; align-items: center; gap: 2px; }
+.pasar button {
+  background: none;
+  border: 0;
+  color: var(--sa);
+  font-size: 22px;
+  line-height: 1;
+  width: 30px;
+  height: 30px;
+  border-radius: 8px;
+  cursor: pointer;
+}
+.pasar button:active { background: rgba(0, 0, 0, 0.06); }
+.pasar .k { min-width: 44px; text-align: center; }
+
+.aviso-ocultas { padding: 4px 76px 0 4px; line-height: 1.7; }
+
+.enlace {
+  background: none;
+  border: 0;
+  padding: 0;
+  font: inherit;
+  color: var(--fa);
+  text-decoration: underline;
+  cursor: pointer;
+}
 
 /* ---------- botones ---------- */
 .btn {

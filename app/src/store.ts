@@ -1,5 +1,5 @@
 import { useSyncExternalStore } from 'react'
-import type { Estado, Evento, MiembroId, Plantilla, Recordatorio, Responsable, Tarea, Dia } from './types'
+import type { Estado, Evento, MiembroId, Plantilla, Recordatorio, Responsable, Tarea, Dia, Vista } from './types'
 import { PLANTILLAS, RECORDATORIOS } from './seed'
 import { dia, desdeYmd, hoy, indiceSemana, lunesDe, semanaDe, sumarDias, ymd } from './dates'
 
@@ -10,6 +10,7 @@ function inicial(): Estado {
   return {
     version: VERSION,
     yo: 'fa',
+    vista: 'mias_y_ambos',
     plantillas: PLANTILLAS,
     tareas: [],
     eventos: [],
@@ -23,7 +24,9 @@ function leer(): Estado {
     if (!crudo) return inicial()
     const datos = JSON.parse(crudo) as Estado
     if (datos.version !== VERSION) return inicial()
-    return datos
+    // Mezclado con los valores por defecto, para que un respaldo viejo no
+    // se quede sin los campos que se agregaron después.
+    return { ...inicial(), ...datos }
   } catch {
     return inicial()
   }
@@ -199,6 +202,10 @@ export function cambiarYo(yo: MiembroId) {
   guardar({ ...estado, yo })
 }
 
+export function cambiarVista(vista: Vista) {
+  guardar({ ...estado, vista })
+}
+
 export function reiniciar() {
   guardar(inicial())
 }
@@ -221,6 +228,7 @@ export function importar(texto: string): { ok: boolean; mensaje: string } {
   guardar({
     version: VERSION,
     yo: datos.yo ?? 'fa',
+    vista: datos.vista ?? 'mias_y_ambos',
     plantillas: datos.plantillas,
     tareas: datos.tareas,
     eventos: datos.eventos ?? [],
