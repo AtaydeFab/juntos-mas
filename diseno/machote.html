@@ -1,0 +1,256 @@
+<title>Machote de la casa</title>
+<style>
+  :root {
+    --paper:#F4F0EE; --surface:#FDFBFA; --surface-2:#EFE9E6;
+    --ink:#1C2427; --ink-2:#3A4448; --muted:#6E7679; --line:#E1D9D6;
+    --fa:#2F6EB0; --fa-soft:#DEE9F6;
+    --sa:#B93A5B; --sa-soft:#F7E3E8;
+    --ni:#9A6712; --ni-soft:#F6EAD2;
+    --good:#0F776D; --good-soft:#DCEDEA;
+    --radius:14px;
+    --display:'Iowan Old Style','Palatino Linotype',Palatino,'Book Antiqua',Georgia,serif;
+    --sans:system-ui,-apple-system,'Segoe UI',Roboto,'Helvetica Neue',sans-serif;
+    --mono:ui-monospace,'SF Mono',Menlo,'DejaVu Sans Mono',monospace;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --paper:#12181A; --surface:#1A2124; --surface-2:#242C2F;
+      --ink:#EBE5E2; --ink-2:#C8C2BF; --muted:#98A1A3; --line:#2D3538;
+      --fa:#79ADE8; --fa-soft:#1B2A3C;
+      --sa:#EE8398; --sa-soft:#3A2229;
+      --ni:#E0AE5C; --ni-soft:#332A18;
+      --good:#4CBFB0; --good-soft:#12302C;
+    }
+  }
+  :root[data-theme="dark"] {
+    --paper:#12181A; --surface:#1A2124; --surface-2:#242C2F;
+    --ink:#EBE5E2; --ink-2:#C8C2BF; --muted:#98A1A3; --line:#2D3538;
+    --fa:#79ADE8; --fa-soft:#1B2A3C;
+    --sa:#EE8398; --sa-soft:#3A2229;
+    --ni:#E0AE5C; --ni-soft:#332A18;
+    --good:#4CBFB0; --good-soft:#12302C;
+  }
+
+  * { box-sizing:border-box; }
+  body { margin:0; background:var(--paper); color:var(--ink); font-family:var(--sans); font-size:16.5px; line-height:1.62; -webkit-font-smoothing:antialiased; }
+  .page { max-width:900px; margin:0 auto; padding:0 24px 96px; }
+  h1,h2,h3 { font-family:var(--display); font-weight:600; margin:0; text-wrap:balance; letter-spacing:-.01em; }
+  p { margin:0; max-width:74ch; color:var(--ink-2); }
+  ul { margin:0; padding-left:20px; max-width:74ch; color:var(--ink-2); }
+  li { margin-bottom:6px; }
+  li::marker { color:var(--muted); }
+
+  header.cover { padding:74px 0 28px; display:grid; gap:18px; border-bottom:1px solid var(--line); }
+  .brand { display:flex; align-items:center; gap:11px; font-family:var(--display); font-size:20px; }
+  .cover h1 { font-size:clamp(32px,4.6vw,48px); line-height:1.07; max-width:18ch; }
+  .cover p { font-size:18.5px; color:var(--muted); }
+
+  section { padding-top:52px; }
+  .sec-title { display:grid; gap:7px; margin-bottom:18px; }
+  .sec-title h2 { font-size:clamp(23px,2.8vw,29px); }
+  .sec-title .n { font-family:var(--mono); font-size:11px; letter-spacing:.14em; color:var(--sa); }
+  .sec-title p { color:var(--muted); }
+  h3 { font-size:18.5px; margin:26px 0 9px; }
+
+  .tw { overflow-x:auto; border:1px solid var(--line); border-radius:var(--radius); background:var(--surface); margin:15px 0; }
+  table { width:100%; border-collapse:collapse; font-size:14.5px; min-width:560px; }
+  th { text-align:left; font-family:var(--mono); font-size:10px; letter-spacing:.12em; text-transform:uppercase; color:var(--muted); font-weight:400; padding:11px 14px; border-bottom:1px solid var(--line); white-space:nowrap; }
+  td { padding:10px 14px; border-bottom:1px solid var(--line); color:var(--ink-2); vertical-align:middle; }
+  tr:last-child td { border-bottom:0; }
+  td b { color:var(--ink); }
+  .money { font-family:var(--mono); font-variant-numeric:tabular-nums; white-space:nowrap; }
+
+  .who { display:inline-flex; align-items:center; gap:7px; white-space:nowrap; }
+  .av { width:24px; height:24px; border-radius:50%; display:inline-grid; place-items:center; font-family:var(--mono); font-size:9.5px; font-weight:700; }
+  .av.fa { background:var(--fa-soft); color:var(--fa); }
+  .av.sa { background:var(--sa-soft); color:var(--sa); }
+  .av.ni { background:var(--ni-soft); color:var(--ni); }
+  .av.jt { background:var(--surface-2); color:var(--muted); }
+
+  .tag { font-family:var(--mono); font-size:9px; letter-spacing:.08em; text-transform:uppercase; padding:2.5px 7px; border-radius:999px; background:var(--surface-2); color:var(--muted); white-space:nowrap; }
+  .tag.new { background:var(--good-soft); color:var(--good); }
+  .tag.flex { background:var(--fa-soft); color:var(--fa); }
+
+  .callout { border-left:3px solid var(--line); background:var(--surface); border-radius:0 var(--radius) var(--radius) 0; padding:15px 18px; display:grid; gap:6px; margin:18px 0; max-width:80ch; }
+  .callout .lbl { font-family:var(--mono); font-size:10px; letter-spacing:.14em; text-transform:uppercase; }
+  .callout p { font-size:15px; max-width:none; }
+  .callout.risk { border-color:var(--ni); background:var(--ni-soft); } .callout.risk .lbl { color:var(--ni); }
+  .callout.dec { border-color:var(--fa); background:var(--fa-soft); } .callout.dec .lbl { color:var(--fa); }
+  .callout.ok { border-color:var(--good); background:var(--good-soft); } .callout.ok .lbl { color:var(--good); }
+
+  .totals { display:grid; gap:12px; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); margin:16px 0; }
+  .tot { background:var(--surface); border:1px solid var(--line); border-radius:var(--radius); padding:15px 16px; display:grid; gap:2px; }
+  .tot .v { font-family:var(--mono); font-size:20px; font-variant-numeric:tabular-nums; }
+  .tot .l { font-size:12.5px; color:var(--muted); }
+
+  .final { margin-top:56px; padding:26px; border-radius:var(--radius); background:var(--surface); border:1px solid var(--line); display:grid; gap:11px; }
+  .final h2 { font-size:22px; }
+  .final p { font-size:15.5px; color:var(--muted); }
+  .final b { color:var(--ink); }
+  footer { margin-top:34px; color:var(--muted); font-size:12.5px; font-family:var(--mono); }
+  @media (prefers-reduced-motion:reduce) { * { transition:none !important; } }
+</style>
+
+<div class="page">
+
+  <header class="cover">
+    <div class="brand">
+      <svg width="24" height="24" viewBox="0 0 30 30" aria-hidden="true">
+        <circle cx="15" cy="15" r="14" fill="none" stroke="currentColor" stroke-opacity=".22"/>
+        <path d="M8 15.5l4.6 4.6L22 10.5" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      <span>Juntos+</span>
+    </div>
+    <h1>El machote de su casa, ya completo</h1>
+    <p>Con tus correcciones, esta es la configuración exacta con la que va a nacer la app. Ya no queda nada inventado por mí: todo lo de aquí es dato tuyo.</p>
+  </header>
+
+  <section>
+    <div class="sec-title"><span class="n">01</span><h2>Los cuatro</h2></div>
+    <div class="tw">
+      <table>
+        <tr><th>Persona</th><th>En la app</th><th>Edad</th><th>Qué ve</th></tr>
+        <tr><td><b>Fabián Atayde</b></td><td><span class="who"><span class="av fa">Fa</span>azul</span></td><td>—</td><td>Todo: tareas, dinero, ajustes</td></tr>
+        <tr><td><b>Saira Martínez</b></td><td><span class="who"><span class="av sa">Sa</span>rosa</span></td><td>—</td><td>Todo: tareas, dinero, ajustes</td></tr>
+        <tr><td><b>Victoria Valentina</b></td><td><span class="who"><span class="av ni">Vi</span>ocre</span></td><td>14</td><td>Tareas de todos y las suyas. Nada de dinero</td></tr>
+        <tr><td><b>Sofía Isabella</b></td><td><span class="who"><span class="av ni">So</span>ocre</span></td><td>11</td><td>Tareas de todos y las suyas. Nada de dinero</td></tr>
+      </table>
+    </div>
+    <p style="font-size:14.5px;color:var(--muted)">Tres tonos y no cuatro: no existe un juego de cuatro colores que se distinga bien para todos los tipos de daltonismo, así que las niñas comparten el ocre y se diferencian por iniciales. Nada depende solo del color.</p>
+  </section>
+
+  <section>
+    <div class="sec-title"><span class="n">02</span><h2>Machote fijo</h2>
+      <p>Quince tareas que se repiten solas. Ya con tus frecuencias reales.</p>
+    </div>
+    <div class="tw">
+      <table>
+        <tr><th>Tarea</th><th>Responsable</th><th>Cada cuándo</th></tr>
+        <tr><td>Hacer el almuerzo</td><td><span class="who"><span class="av sa">Sa</span>Saira</span></td><td>Diario</td></tr>
+        <tr><td>Hacer la comida</td><td><span class="who"><span class="av sa">Sa</span>Saira</span></td><td>Diario</td></tr>
+        <tr><td>Hacer la cena</td><td><span class="who"><span class="av sa">Sa</span>Saira</span></td><td>Diario</td></tr>
+        <tr><td>Trapear</td><td><span class="who"><span class="av sa">Sa</span>Saira</span></td><td>Diario</td></tr>
+        <tr><td>Sacar al perro en la mañana</td><td><span class="who"><span class="av sa">Sa</span>Saira</span></td><td>Diario</td></tr>
+        <tr><td>Lavar trastes del almuerzo</td><td><span class="who"><span class="av fa">Fa</span>Fabián</span></td><td>Diario</td></tr>
+        <tr><td>Lavar trastes de la comida</td><td><span class="who"><span class="av fa">Fa</span>Fabián</span></td><td>Diario</td></tr>
+        <tr><td>Lavar trastes de la cena</td><td><span class="who"><span class="av fa">Fa</span>Fabián</span></td><td>Diario</td></tr>
+        <tr><td>Alzar la cama</td><td><span class="who"><span class="av fa">Fa</span>Fabián</span></td><td>Diario, en la mañana</td></tr>
+        <tr><td>Recoger cosas y pasar la aspiradora</td><td><span class="who"><span class="av fa">Fa</span>Fabián</span></td><td>Diario</td></tr>
+        <tr><td>Sacar la basura</td><td><span class="who"><span class="av fa">Fa</span>Fabián</span></td><td>Diario · el camión pasa diario</td></tr>
+        <tr><td>Sacar al perro en la tarde</td><td><span class="who"><span class="av jt">Jt</span>De los dos</span></td><td>Diario · lo palomea cualquiera</td></tr>
+        <tr><td>Darle de comer al perro</td><td><span class="who"><span class="av jt">Jt</span>Turno semanal</span></td><td>Diario · se alterna cada lunes</td></tr>
+        <tr><td>Lavar la ropa</td><td><span class="who"><span class="av fa">Fa</span>Fabián</span></td><td><span class="tag flex">sin día fijo</span> Una vez a la semana, puede tomar 2 o 3 días</td></tr>
+        <tr><td>Lavar el baño</td><td><span class="who"><span class="av sa">Sa</span>Saira</span></td><td><span class="tag flex">sin día fijo</span> Una vez a la semana</td></tr>
+      </table>
+    </div>
+
+    <div class="callout dec">
+      <span class="lbl">Tipo nuevo de tarea</span>
+      <p><b>Sin día fijo.</b> Lavar la ropa y lavar el baño no tienen día: aparecen como pendientes de la semana y quien las tiene elige cuándo. La ropa además puede quedar abierta dos o tres días sin que la app la marque como atrasada — se palomea cuando quedó lista, no cuando empezó. Si llega el domingo sin hacerse, la app lo recuerda una vez y ya.</p>
+    </div>
+
+    <h3>Las niñas</h3>
+    <p>Sin tareas fijas, porque no vienen todos los fines de semana. Cuando estén, se les asigna a mano lo que toque —recoger la mesa, su cuarto, lo que sea— y les llega a su teléfono. Ven las tareas de todos, igual que ustedes.</p>
+  </section>
+
+  <section>
+    <div class="sec-title"><span class="n">03</span><h2>Pasarle pendientes al otro <span class="tag new">función nueva</span></h2>
+      <p>Esto no estaba en el plan y cambia cómo se usa la app todos los días.</p>
+    </div>
+    <p>Cualquiera puede agregarle un pendiente a otro y le llega a los suyos: Saira te pone "cambiar la bombilla del pasillo", tú le pones "bañar al perro", y a las niñas "limpiar la mesa" cuando estén. Llega con aviso y se queda en pendientes hasta que se palomea.</p>
+    <div class="callout risk">
+      <span class="lbl">Cómo lo diseño para que no se vuelva un látigo</span>
+      <p>Yo había propuesto que nadie pudiera asignarle nada al otro sin que lo aceptara. Tú lo quieres directo, y es tu casa — así queda. Pero le dejo una válvula: quien lo recibe puede <b>moverlo de día o decir "no puedo"</b>, y eso le regresa al que lo puso. Sin esa salida, una app así se convierte en la lista de órdenes de uno para el otro, y es la manera más rápida de que alguien deje de abrirla.</p>
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-title"><span class="n">04</span><h2>Recordatorios de convivencia</h2>
+      <p>Las cosas chiquitas que no son tareas pero desgastan.</p>
+    </div>
+    <div class="tw">
+      <table>
+        <tr><th>Recordatorio</th><th>Le aparece a</th></tr>
+        <tr><td>No dejar pelos en el jabón</td><td><span class="who"><span class="av fa">Fa</span>Fabián</span></td></tr>
+        <tr><td>Dejar bien tapada la pasta</td><td><span class="who"><span class="av fa">Fa</span>Fabián</span></td></tr>
+        <tr><td>No dejar la ropa sucia en el baño</td><td><span class="who"><span class="av sa">Sa</span>Saira</span></td></tr>
+        <tr><td>No dejar los zapatos regados</td><td><span class="who"><span class="av sa">Sa</span>Saira</span></td></tr>
+      </table>
+    </div>
+    <ul>
+      <li><b>Cada quien ve solo los suyos</b>, uno o dos al día, rotando. Nunca hay una pantalla con la lista de fallas del otro.</li>
+      <li><b>Si le propones uno al otro, le llega para aceptar.</b> Mientras no lo acepte, no se muestra: así es acuerdo y no regla impuesta.</li>
+      <li><b>También los hay de una semana</b>: "el viernes viene el del gas" se va solo cuando pasa el viernes.</li>
+    </ul>
+  </section>
+
+  <section>
+    <div class="sec-title"><span class="n">05</span><h2>Dinero</h2>
+      <p>Ingresos, fijos y ahorro. Todo visible entre ustedes dos.</p>
+    </div>
+
+    <h3>Lo que entra</h3>
+    <div class="tw">
+      <table>
+        <tr><th>Quién</th><th>Cuánto</th><th>Cada cuándo</th><th>Cómo lo maneja la app</th></tr>
+        <tr><td><span class="who"><span class="av fa">Fa</span>Fabián</span></td><td class="money">$12,300</td><td>Quincenal</td><td>Ingreso fijo. De ahí salen $3,000 de pensión, que entra como gasto fijo para que se vea</td></tr>
+        <tr><td><span class="who"><span class="av sa">Sa</span>Saira</span></td><td class="money">meta $4,500</td><td>Semanal</td><td>Ingreso variable: se registra lo que de verdad entra y la meta queda de referencia</td></tr>
+      </table>
+    </div>
+
+    <h3>Lo que sale fijo</h3>
+    <div class="tw">
+      <table>
+        <tr><th>Concepto</th><th>Monto</th><th>Cada cuándo</th><th>Quién paga</th></tr>
+        <tr><td><b>Ahorro</b></td><td class="money">$4,000</td><td>Quincenal</td><td><span class="who"><span class="av fa">Fa</span>$2,000</span> &nbsp; <span class="who"><span class="av sa">Sa</span>$2,000</span></td></tr>
+        <tr><td><b>Pensión de las niñas</b></td><td class="money">$3,000</td><td>Quincenal</td><td><span class="who"><span class="av fa">Fa</span>Fabián</span></td></tr>
+        <tr><td><b>Renta</b></td><td class="money">$4,500</td><td>Mensual, día 6</td><td><span class="who"><span class="av fa">Fa</span>$2,500</span> &nbsp; <span class="who"><span class="av sa">Sa</span>$2,000</span></td></tr>
+        <tr><td><b>Internet</b></td><td class="money">~$450</td><td>Mensual</td><td><span class="who"><span class="av sa">Sa</span>Saira</span></td></tr>
+        <tr><td><b>Luz</b></td><td class="money">~$600</td><td>Cada 2 meses</td><td><span class="who"><span class="av fa">Fa</span>Fabián</span></td></tr>
+        <tr><td><b>Súper</b></td><td class="money">~$1,000</td><td>Semanal</td><td>El que vaya · monto real al pagar</td></tr>
+      </table>
+    </div>
+
+    <div class="totals">
+      <div class="tot"><span class="v">$42,600</span><span class="l">Entra al mes entre los dos, si se cumple la meta</span></div>
+      <div class="tot"><span class="v">$23,250</span><span class="l">Sale fijo al mes, ahorro y pensión incluidos</span></div>
+      <div class="tot"><span class="v">$19,350</span><span class="l">Queda para lo variable</span></div>
+      <div class="tot"><span class="v">$8,000</span><span class="l">Se ahorra al mes</span></div>
+    </div>
+
+    <div class="callout dec">
+      <span class="lbl">Tres decisiones de cómo se registra</span>
+      <p><b>El ahorro va como gasto fijo</b>, no como lo que sobró: se aparta primero y así no se gasta sin querer. <b>La pensión también</b>, contra tu ingreso completo, para que se vea que existe en lugar de esconderla restándola. Y <b>la meta de Saira nunca se da por hecha</b>: la app enseña lo que de verdad entró esa semana y cuánto falta, porque un ingreso variable puesto como fijo hace que los números mientan.</p>
+    </div>
+
+    <h3>Categorías</h3>
+    <p>Ahorro · Pensión · Renta · Servicios (luz, internet) · Súper · Comidas fuera · Entretenimiento · Perro · Niñas · Otros.</p>
+  </section>
+
+  <section>
+    <div class="sec-title"><span class="n">06</span><h2>Qué cambió en el plan</h2></div>
+    <div class="tw">
+      <table>
+        <tr><th>Dato tuyo</th><th>Efecto</th></tr>
+        <tr><td>Victoria 14 y Sofía 11</td><td><b>Menos trabajo.</b> Se cae la app infantil con dibujos y estrellas: es la misma app con permisos distintos.</td></tr>
+        <tr><td>Los cuatro en Android</td><td><b>Menos riesgo.</b> Las notificaciones funcionan sin las limitaciones de iPhone.</td></tr>
+        <tr><td>Pasarle pendientes al otro</td><td>Función nueva en la v1, con la válvula de "no puedo".</td></tr>
+        <tr><td>Recordatorios de convivencia</td><td>Función nueva en la v1, cada quien ve solo los suyos.</td></tr>
+        <tr><td>Lavar ropa y baño sin día fijo</td><td>Tipo nuevo de tarea: semanal flexible, que puede durar varios días.</td></tr>
+        <tr><td>Tareas de los dos y turno semanal</td><td>Dos tipos nuevos de responsable en el modelo.</td></tr>
+        <tr><td>Renta y ahorro partidos</td><td>Los gastos fijos aceptan aportaciones distintas por persona.</td></tr>
+        <tr><td>Ingreso variable de Saira</td><td>Metas de ingreso: se registra lo real, la meta es referencia.</td></tr>
+        <tr><td>Saira está de acuerdo</td><td><b>El riesgo número uno del proyecto se cae.</b> Era el único que podía tumbar la app entera.</td></tr>
+      </table>
+    </div>
+  </section>
+
+  <div class="final">
+    <h2>Ya no me falta nada para empezar</h2>
+    <p>Tengo los cuatro nombres, las quince tareas con sus frecuencias, los recordatorios, los ingresos, los fijos con quién paga qué, y el visto bueno de Saira.</p>
+    <p>Lo único que dejo abierto —y no me bloquea— es si Saira quiere <b>ver su meta semanal dentro de la app</b> o prefiere registrar nomás lo que entra. Se puede prender y apagar después.</p>
+    <p style="color:var(--ink);font-weight:600">Cuando escribas APROBADO, arranco con la fase 1 y te voy enseñando cada parte conforme la construya.</p>
+  </div>
+
+  <footer>Juntos+ · configuración final · agosto 2026</footer>
+</div>

@@ -1,0 +1,17 @@
+{
+  "name": "Juntos+",
+  "short_name": "Juntos+",
+  "description": "La casa de los cuatro: tareas, calendario y recordatorios.",
+  "start_url": ".",
+  "scope": ".",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#f4f0ee",
+  "theme_color": "#f4f0ee",
+  "lang": "es-MX",
+  "icons": [
+    { "src": "icono-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icono-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "icono-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}

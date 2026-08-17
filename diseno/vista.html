@@ -1,0 +1,646 @@
+<title>Juntos+</title>
+<style>
+  :root {
+    --paper:#F4F0EE; --surface:#FDFBFA; --surface-2:#EFE9E6;
+    --ink:#1C2427; --ink-2:#3A4448; --muted:#6E7679; --line:#E1D9D6;
+    --fa:#2F6EB0; --fa-soft:#DEE9F6; --fa-mark:#2F6EB0;
+    --sa:#B93A5B; --sa-soft:#F7E3E8; --sa-mark:#B93A5B;
+    --ni:#9A6712; --ni-soft:#F6EAD2; --ni-mark:#B0761A;
+    --good:#0F776D; --good-soft:#DCEDEA;
+    --on-accent:#FFFFFF;
+    --shadow:0 18px 40px -24px rgba(28,36,39,.45);
+    --radius:16px;
+    --display:'Iowan Old Style','Palatino Linotype',Palatino,'Book Antiqua',Georgia,serif;
+    --sans:system-ui,-apple-system,'Segoe UI',Roboto,'Helvetica Neue',sans-serif;
+    --mono:ui-monospace,'SF Mono',Menlo,'DejaVu Sans Mono',monospace;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --paper:#12181A; --surface:#1A2124; --surface-2:#242C2F;
+      --ink:#EBE5E2; --ink-2:#C8C2BF; --muted:#98A1A3; --line:#2D3538;
+      --fa:#79ADE8; --fa-soft:#1B2A3C; --fa-mark:#4A8BD4;
+      --sa:#EE8398; --sa-soft:#3A2229; --sa-mark:#D9647F;
+      --ni:#E0AE5C; --ni-soft:#332A18; --ni-mark:#B4862F;
+      --good:#4CBFB0; --good-soft:#12302C;
+      --on-accent:#0C1516;
+      --shadow:0 18px 40px -24px rgba(0,0,0,.8);
+    }
+  }
+  :root[data-theme="dark"] {
+    --paper:#12181A; --surface:#1A2124; --surface-2:#242C2F;
+    --ink:#EBE5E2; --ink-2:#C8C2BF; --muted:#98A1A3; --line:#2D3538;
+    --fa:#79ADE8; --fa-soft:#1B2A3C; --fa-mark:#4A8BD4;
+    --sa:#EE8398; --sa-soft:#3A2229; --sa-mark:#D9647F;
+    --ni:#E0AE5C; --ni-soft:#332A18; --ni-mark:#B4862F;
+    --good:#4CBFB0; --good-soft:#12302C;
+    --on-accent:#0C1516;
+    --shadow:0 18px 40px -24px rgba(0,0,0,.8);
+  }
+
+  * { box-sizing:border-box; }
+  body { margin:0; background:var(--paper); color:var(--ink); font-family:var(--sans); font-size:17px; line-height:1.62; -webkit-font-smoothing:antialiased; }
+  .wrap { max-width:1080px; margin:0 auto; padding:0 24px 96px; }
+  h1,h2,h3 { font-family:var(--display); font-weight:600; margin:0; text-wrap:balance; letter-spacing:-.01em; }
+  p { margin:0; }
+  .eyebrow { font-family:var(--mono); font-size:11px; letter-spacing:.16em; text-transform:uppercase; color:var(--muted); }
+
+  header.hero { padding:74px 0 20px; display:grid; gap:22px; }
+  .mark { display:flex; align-items:center; gap:11px; }
+  .mark .name { font-family:var(--display); font-size:25px; letter-spacing:-.02em; }
+  .hero h1 { font-size:clamp(34px,5.2vw,58px); line-height:1.05; max-width:19ch; }
+  .hero .lede { font-size:19.5px; color:var(--muted); max-width:60ch; }
+  .hero .lede strong { color:var(--ink); font-weight:600; }
+  .team { display:flex; gap:20px; flex-wrap:wrap; padding-top:4px; }
+  .team span { display:flex; align-items:center; gap:8px; font-size:15px; color:var(--muted); }
+  .team .av { width:26px; height:26px; }
+  .team b { color:var(--ink); font-weight:600; }
+
+  section { padding-top:64px; }
+  .sec-head { display:grid; gap:10px; margin-bottom:26px; max-width:62ch; }
+  .sec-head h2 { font-size:clamp(25px,3.2vw,33px); }
+  .sec-head p { color:var(--muted); }
+  .sec-head b { color:var(--ink); font-weight:600; }
+
+  .cards { display:grid; gap:16px; grid-template-columns:repeat(auto-fit,minmax(258px,1fr)); }
+  .card { background:var(--surface); border:1px solid var(--line); border-radius:var(--radius); padding:20px; display:grid; gap:7px; align-content:start; }
+  .card h3 { font-size:18px; }
+  .card p { color:var(--muted); font-size:15px; }
+  .card .w { font-family:var(--mono); font-size:11px; letter-spacing:.06em; text-transform:uppercase; color:var(--fa); }
+
+  .screens { display:grid; gap:50px; }
+  .screen-row { display:grid; gap:30px; align-items:center; grid-template-columns:minmax(0,300px) minmax(0,1fr); }
+  .screen-row.pair { grid-template-columns:minmax(0,300px) minmax(0,300px) minmax(0,1fr); }
+  @media (max-width:920px) { .screen-row.pair { grid-template-columns:1fr; justify-items:start; } }
+  @media (max-width:760px) { .screen-row { grid-template-columns:1fr; justify-items:start; } }
+  .screen-note { display:grid; gap:10px; max-width:46ch; }
+  .screen-note h3 { font-size:22px; }
+  .screen-note p { color:var(--muted); font-size:16px; }
+  .screen-note ul { margin:2px 0 0; padding-left:18px; color:var(--muted); font-size:15.5px; }
+  .screen-note li { margin-bottom:5px; }
+  .screen-note b { color:var(--ink); font-weight:600; }
+
+  .gallery { display:grid; gap:26px; grid-template-columns:repeat(auto-fit,minmax(300px,1fr)); justify-items:center; }
+  .gal-item { display:grid; gap:11px; justify-items:start; max-width:320px; }
+  .gal-item p { font-size:14.5px; color:var(--muted); }
+  .gal-item h3 { font-size:17px; }
+
+  .phone { width:300px; background:var(--surface); border:1px solid var(--line); border-radius:36px; padding:9px; box-shadow:var(--shadow); }
+  .app { background:var(--paper); border-radius:28px; overflow:hidden; font-size:13px; line-height:1.45; }
+  .status { display:flex; justify-content:space-between; padding:9px 18px 3px; font-family:var(--mono); font-size:10px; color:var(--muted); }
+  .app-head { padding:6px 16px 10px; display:flex; justify-content:space-between; align-items:baseline; gap:8px; }
+  .app-head .t { font-family:var(--display); font-size:20px; }
+  .app-head .s { font-size:11px; color:var(--muted); }
+  .app-body { padding:0 12px 12px; display:grid; gap:8px; }
+
+  .av { width:22px; height:22px; border-radius:50%; display:grid; place-items:center; font-family:var(--mono); font-size:9px; font-weight:700; }
+  .av.fa { background:var(--fa-soft); color:var(--fa); }
+  .av.sa { background:var(--sa-soft); color:var(--sa); }
+  .av.ni { background:var(--ni-soft); color:var(--ni); }
+  .av.jt { background:var(--surface-2); color:var(--muted); }
+
+  .task { width:100%; text-align:left; font:inherit; color:inherit; display:grid; grid-template-columns:22px 1fr auto; gap:10px; align-items:center;
+    background:var(--surface); border:1px solid var(--line); border-radius:13px; padding:10px 11px; cursor:pointer; }
+  .task:focus-visible { outline:2px solid var(--fa); outline-offset:2px; }
+  .task .txt { display:grid; gap:2px; min-width:0; }
+  .task .txt b { font-weight:600; font-size:13px; }
+  .task .txt small { color:var(--muted); font-size:10.5px; }
+  .rep { font-family:var(--mono); font-size:9px; color:var(--muted); border:1px solid var(--line); border-radius:5px; padding:0 4px; }
+  .box { width:21px; height:21px; border-radius:7px; border:1.5px solid var(--line); display:grid; place-items:center; color:transparent; transition:.18s ease; }
+  .box svg { width:12px; height:12px; }
+  .task[aria-checked="true"] .box { border-color:transparent; color:var(--surface); }
+  .task[aria-checked="true"].fa .box { background:var(--fa-mark); }
+  .task[aria-checked="true"].sa .box { background:var(--sa-mark); }
+  .task[aria-checked="true"].ni .box { background:var(--ni-mark); }
+  .task[aria-checked="true"].jt .box { background:var(--muted); }
+  .task[aria-checked="true"] .txt b { text-decoration:line-through; color:var(--muted); font-weight:500; }
+  .pill { font-family:var(--mono); font-size:9px; letter-spacing:.06em; text-transform:uppercase; padding:3px 7px; border-radius:999px; background:var(--ni-soft); color:var(--ni); white-space:nowrap; }
+  .pill.new { background:var(--good-soft); color:var(--good); }
+  .grp { font-family:var(--mono); font-size:9.5px; letter-spacing:.12em; text-transform:uppercase; color:var(--muted); padding:7px 4px 1px; }
+
+  .nav { display:grid; grid-template-columns:repeat(5,1fr); gap:2px; border-top:1px solid var(--line); background:var(--surface); padding:8px 4px 12px;
+    font-size:9px; text-align:center; color:var(--muted); font-family:var(--mono); letter-spacing:.02em; }
+  .nav div { display:grid; gap:4px; justify-items:center; }
+  .nav .dot { width:5px; height:5px; border-radius:50%; background:transparent; }
+  .nav .on { color:var(--ink); }
+  .nav .on .dot { background:var(--ink); }
+
+  .panel { background:var(--surface); border:1px solid var(--line); border-radius:13px; padding:12px; display:grid; gap:9px; }
+  .panel .k { font-family:var(--mono); font-size:9.5px; letter-spacing:.12em; text-transform:uppercase; color:var(--muted); }
+  .note { font-size:10.5px; color:var(--muted); }
+  .rule { height:1px; background:var(--line); }
+  .btn { width:100%; font:inherit; font-size:11.5px; font-weight:600; cursor:pointer; background:var(--ink); color:var(--paper); border:0; border-radius:10px; padding:9px; }
+  .btn.ghost { background:transparent; color:var(--muted); border:1px dashed var(--line); font-weight:400; }
+  .field { display:flex; align-items:center; gap:7px; border:1px dashed var(--line); border-radius:10px; padding:9px 10px; font-size:11.5px; color:var(--muted); }
+
+  .reminder { background:var(--sa-soft); border-radius:13px; padding:12px 13px; display:grid; gap:5px; }
+  .reminder .k { font-family:var(--mono); font-size:9px; letter-spacing:.14em; text-transform:uppercase; color:var(--sa); }
+  .reminder .q { font-family:var(--display); font-size:15px; line-height:1.3; color:var(--ink); }
+
+  .switch-row { display:grid; grid-template-columns:1fr auto; gap:10px; align-items:center; padding:9px 0; }
+  .switch-row + .switch-row { border-top:1px solid var(--line); }
+  .switch-row .lbl { font-size:12px; }
+  .switch-row .lbl small { display:block; color:var(--muted); font-size:10px; }
+  .sw { width:36px; height:21px; border-radius:999px; background:var(--surface-2); position:relative; border:1px solid var(--line); }
+  .sw::after { content:""; position:absolute; top:2px; left:2px; width:15px; height:15px; border-radius:50%; background:var(--surface); box-shadow:0 1px 2px rgba(0,0,0,.2); }
+  .sw.on { background:var(--fa-mark); border-color:transparent; }
+  .sw.on::after { left:auto; right:2px; background:#fff; }
+
+  .wk { display:grid; gap:4px; }
+  .wk-row { display:grid; grid-template-columns:26px 1fr 1fr; gap:4px; align-items:stretch; }
+  .wk-row .d { font-family:var(--mono); font-size:9px; text-transform:uppercase; color:var(--muted); align-self:center; }
+  .wk-row .t { font-size:9.5px; padding:5px 6px; border-radius:8px; line-height:1.3; }
+  .t.fa { background:var(--fa-soft); color:var(--fa); }
+  .t.sa { background:var(--sa-soft); color:var(--sa); }
+  .t.ni { background:var(--ni-soft); color:var(--ni); }
+  .t.jt { background:var(--surface-2); color:var(--muted); }
+  .t.once { background:transparent; border:1px dashed var(--line); color:var(--muted); }
+
+  .hero-num { font-family:var(--mono); font-size:25px; font-variant-numeric:tabular-nums; letter-spacing:-.02em; }
+  .kpis { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+  .kpi { display:grid; gap:1px; }
+  .kpi .v { font-family:var(--mono); font-size:14px; font-variant-numeric:tabular-nums; }
+  .kpi .l { font-size:10px; color:var(--muted); }
+  .barlist { display:grid; gap:8px; }
+  .barlist .row { display:grid; gap:3px; }
+  .barlist .top { display:flex; justify-content:space-between; font-size:11px; }
+  .barlist .top .amt { font-family:var(--mono); font-variant-numeric:tabular-nums; color:var(--muted); }
+  .track { height:8px; background:var(--surface-2); border-radius:4px; overflow:hidden; }
+  .fill { height:100%; border-radius:4px; background:var(--fa-mark); display:block; }
+  .fill.sa { background:var(--sa-mark); }
+  .fill.n { background:var(--muted); opacity:.5; }
+  .fill.g { background:var(--good); }
+  .stackbar { display:flex; gap:2px; height:14px; }
+  .stackbar span { height:100%; }
+  .stackbar span:first-child { border-radius:4px 0 0 4px; }
+  .stackbar span:last-child { border-radius:0 4px 4px 0; }
+  .legend { display:flex; gap:12px; flex-wrap:wrap; font-size:10.5px; color:var(--muted); }
+  .legend i { width:9px; height:9px; border-radius:2px; display:inline-block; margin-right:5px; }
+  table.mini { width:100%; border-collapse:collapse; font-size:11px; }
+  table.mini th { font-family:var(--mono); font-size:9px; letter-spacing:.08em; text-transform:uppercase; color:var(--muted); font-weight:400; text-align:right; padding-bottom:5px; }
+  table.mini th:first-child { text-align:left; }
+  table.mini td { padding:5px 0; border-top:1px solid var(--line); text-align:right; font-variant-numeric:tabular-nums; font-family:var(--mono); font-size:10.5px; }
+  table.mini td:first-child { text-align:left; font-family:var(--sans); font-size:11.5px; }
+
+  .closing { margin-top:60px; padding:28px 26px; border-radius:var(--radius); background:var(--surface); border:1px solid var(--line); display:grid; gap:11px; }
+  .closing h2 { font-size:23px; }
+  .closing p { color:var(--muted); font-size:15.5px; max-width:74ch; }
+  .closing b { color:var(--ink); }
+  footer { margin-top:36px; color:var(--muted); font-size:12.5px; font-family:var(--mono); }
+  @media (prefers-reduced-motion:reduce) { * { transition:none !important; } }
+</style>
+
+<div class="wrap">
+
+  <header class="hero">
+    <div class="mark">
+      <svg width="29" height="29" viewBox="0 0 30 30" aria-hidden="true">
+        <circle cx="15" cy="15" r="14" fill="none" stroke="currentColor" stroke-opacity=".22"/>
+        <path d="M8 15.5l4.6 4.6L22 10.5" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      <span class="name">Juntos+</span>
+    </div>
+
+    <h1>Su casa, con lo de cada quien a la vista.</h1>
+    <p class="lede">Las tareas de siempre ya vienen puestas y se palomean con un toque. Lo que sale de repente se le pasa al otro y le llega a sus pendientes. Y el dinero de los dos —lo que entra, lo que se va y lo que se ahorra— en la misma app. <strong>Todo lo que ven aquí son sus datos reales</strong>, no ejemplos.</p>
+
+    <div class="team">
+      <span><span class="av fa">Fa</span><b>Fabián</b></span>
+      <span><span class="av sa">Sa</span><b>Saira</b></span>
+      <span><span class="av ni">Vi</span><b>Victoria</b> · 14</span>
+      <span><span class="av ni">So</span><b>Sofía</b> · 11</span>
+    </div>
+  </header>
+
+  <section>
+    <div class="sec-head">
+      <p class="eyebrow">Cómo funciona</p>
+      <h2>Cuatro ideas y ya está</h2>
+      <p>No hay que aprender nada. Si entienden estas tres, entienden toda la app.</p>
+    </div>
+    <div class="cards">
+      <div class="card"><span class="w">se repite</span><h3>Lo de siempre se pone una vez</h3><p>Hacer la comida, lavar los trastes, sacar al perro. Cada tarea trae quién la hace y cada cuándo; de ahí en adelante aparece sola. Nadie la vuelve a escribir.</p></div>
+      <div class="card"><span class="w">solo esta vez</span><h3>Lo que sale de repente</h3><p>Cambiar una bombilla, llevar el carro, bañar al perro. Se agrega sin marcar "se repite": se hace, se palomea y desaparece.</p></div>
+      <div class="card"><span class="w">se asigna</span><h3>Se le puede pasar al otro</h3><p>Saira te agrega "cambiar la bombilla" y te llega a tus pendientes. Tú le agregas "bañar al perro" y le llega a los suyos. A las niñas igual, cuando estén.</p></div>
+      <div class="card"><span class="w">se agenda</span><h3>Las fechas que importan</h3><p>El aniversario y los cumpleaños se ponen una vez y vuelven solos cada año. Un plan de una vez —ir al beisbol— queda pendiente para los dos y avisa antes.</p></div>
+      <div class="card"><span class="w">se recuerda</span><h3>Y las cosas chiquitas</h3><p>"No dejar pelos en el jabón." "No dejar los zapatos regados." Aparecen de a poquito, y <b>solo en el teléfono de quien le toca</b> — nunca como lista de quejas del otro.</p></div>
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-head">
+      <p class="eyebrow">Así se ve</p>
+      <h2>Un jueves cualquiera</h2>
+      <p>Las palomitas de esta pantalla se pueden marcar aquí mismo — pruébenlas.</p>
+    </div>
+
+    <div class="screens">
+
+      <div class="screen-row">
+        <div class="phone">
+          <div class="app">
+            <div class="status"><span>7:40</span><span>▮▮▮ 92%</span></div>
+            <div class="app-head"><span class="t">Hoy</span><span class="s">jueves 20</span></div>
+            <div class="app-body">
+              <div class="reminder">
+                <span class="k">Acuérdate</span>
+                <p class="q">"Dejar bien tapada la pasta."</p>
+              </div>
+
+              <button class="task fa" role="checkbox" aria-checked="true">
+                <span class="av fa">Fa</span>
+                <span class="txt"><b>Alzar la cama</b><small><span class="rep">↻</span> diario · hecho 7:15</small></span>
+                <span class="box"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12.5l5.5 5.5L20 6.5"/></svg></span>
+              </button>
+              <button class="task sa" role="checkbox" aria-checked="true">
+                <span class="av sa">Sa</span>
+                <span class="txt"><b>Sacar al perro en la mañana</b><small><span class="rep">↻</span> diario · hecho 7:30</small></span>
+                <span class="box"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12.5l5.5 5.5L20 6.5"/></svg></span>
+              </button>
+              <button class="task sa" role="checkbox" aria-checked="false">
+                <span class="av sa">Sa</span>
+                <span class="txt"><b>Hacer el almuerzo</b><small><span class="rep">↻</span> diario</small></span>
+                <span class="box"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12.5l5.5 5.5L20 6.5"/></svg></span>
+              </button>
+              <button class="task fa" role="checkbox" aria-checked="false">
+                <span class="av fa">Fa</span>
+                <span class="txt"><b>Lavar trastes del almuerzo</b><small><span class="rep">↻</span> diario</small></span>
+                <span class="box"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12.5l5.5 5.5L20 6.5"/></svg></span>
+              </button>
+              <button class="task fa" role="checkbox" aria-checked="false">
+                <span class="av fa">Fa</span>
+                <span class="txt"><b>Darle de comer al perro</b><small>Tu semana · hasta el domingo</small></span>
+                <span class="box"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12.5l5.5 5.5L20 6.5"/></svg></span>
+              </button>
+              <button class="task jt" role="checkbox" aria-checked="false">
+                <span class="av jt">Jt</span>
+                <span class="txt"><b>Sacar al perro en la tarde</b><small><span class="rep">↻</span> diario · de los dos</small></span>
+                <span class="box"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12.5l5.5 5.5L20 6.5"/></svg></span>
+              </button>
+
+              <div class="grp">Te lo pasó Saira</div>
+              <button class="task fa" role="checkbox" aria-checked="false">
+                <span class="av fa">Fa</span>
+                <span class="txt"><b>Cambiar la bombilla del pasillo</b><small>Saira lo agregó ayer</small></span>
+                <span class="pill new">Nuevo</span>
+              </button>
+
+              <button class="btn ghost" type="button">＋ Agregar tarea o pendiente</button>
+            </div>
+            <div class="nav"><div class="on"><span class="dot"></span>Hoy</div><div><span class="dot"></span>Semana</div><div><span class="dot"></span>Calendario</div><div><span class="dot"></span>Dinero</div><div><span class="dot"></span>Más</div></div>
+            </div>
+          </div>
+        </div>
+        <div class="screen-note">
+          <p class="eyebrow">La pantalla de todos los días</p>
+          <h3>Lo del día, de los cuatro</h3>
+          <p>Se ve lo de cada quien, no nada más lo propio. La idea no es vigilarse: es que nadie tenga que preguntar si ya se hizo algo.</p>
+          <ul>
+            <li>Las de siempre traen <b>↻</b>. Las que salieron de repente no traen nada, porque se van cuando se hacen.</li>
+            <li><b>De los dos:</b> sacar al perro en la tarde lo palomea cualquiera y queda anotado quién fue.</li>
+            <li><b>La semana del perro</b> se alterna sola cada lunes. Si a alguien se le pasa su semana, se recorre, no se pierde.</li>
+            <li>Si hoy no se puede, se desliza: <b>"hoy no puedo, ¿la tomas tú?"</b> Le llega al otro como petición, no como falla.</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="screen-row pair">
+        <div class="phone">
+          <div class="app">
+            <div class="status"><span>20:02</span><span>▮▮▮ 61%</span></div>
+            <div class="app-head"><span class="t">Semana</span><span class="s">18 – 24 ago</span></div>
+            <div class="app-body">
+              <div class="panel">
+                <div class="wk">
+                  <div class="wk-row"><span class="d">Lun</span><span class="t sa">Comidas · trapear · perro am</span><span class="t fa">Trastes ×3 · cama · barrer · basura</span></div>
+                  <div class="wk-row"><span class="d">Mar</span><span class="t sa">Comidas · trapear · perro am</span><span class="t fa">Trastes ×3 · cama · barrer · basura</span></div>
+                  <div class="wk-row"><span class="d">Mié</span><span class="t sa">Comidas · trapear · perro am</span><span class="t fa">Trastes ×3 · cama · barrer · basura</span></div>
+                  <div class="wk-row"><span class="d">Jue</span><span class="t sa">Comidas · trapear · perro am</span><span class="t fa">＋ bombilla del pasillo</span></div>
+                  <div class="wk-row"><span class="d">Vie</span><span class="t sa">Comidas · trapear · perro am</span><span class="t fa">Trastes ×3 · cama · barrer · basura</span></div>
+                  <div class="wk-row"><span class="d">Sáb</span><span class="t ni">Vienen Victoria y Sofía</span><span class="t once">Sin tareas puestas aún</span></div>
+                  <div class="wk-row"><span class="d">Dom</span><span class="t sa">Comidas · trapear · perro am</span><span class="t fa">Trastes ×3 · cama · barrer</span></div>
+                </div>
+                <div class="rule"></div>
+                <p class="note">Todos los días también: sacar al perro en la tarde (de los dos) y darle de comer (semana de Fabián).</p>
+              </div>
+              <div class="panel">
+                <span class="k">De esta semana, sin día fijo</span>
+                <div style="display:grid;gap:6px">
+                  <span style="font-size:11.5px"><span class="av sa" style="display:inline-grid;vertical-align:-6px;margin-right:5px">Sa</span>Lavar el baño — <b>elige tu día</b></span>
+                  <span style="font-size:11.5px"><span class="av fa" style="display:inline-grid;vertical-align:-6px;margin-right:5px">Fa</span>Lavar la ropa — <b>elige tus días</b></span>
+                </div>
+                <p class="note">Se tienen que hacer esta semana, pero cada quien decide cuándo. Si llega el domingo sin hacerse, la app lo recuerda una vez, sin regaño.</p>
+              </div>
+            </div>
+            <div class="nav"><div><span class="dot"></span>Hoy</div><div class="on"><span class="dot"></span>Semana</div><div><span class="dot"></span>Calendario</div><div><span class="dot"></span>Dinero</div><div><span class="dot"></span>Más</div></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="phone">
+          <div class="app">
+            <div class="status"><span>20:05</span><span>▮▮▮ 60%</span></div>
+            <div class="app-head"><span class="t">Nuevo</span><span class="s">cancelar</span></div>
+            <div class="app-body">
+              <div class="panel">
+                <div class="field" style="border-style:solid;color:var(--ink)">Bañar al perro</div>
+                <div class="switch-row">
+                  <span class="lbl">¿Para quién?<small>Le llega a sus pendientes</small></span>
+                  <span style="display:flex;gap:5px">
+                    <span class="av fa" style="opacity:.3">Fa</span><span class="av sa">Sa</span>
+                    <span class="av ni" style="opacity:.3">Vi</span><span class="av ni" style="opacity:.3">So</span>
+                  </span>
+                </div>
+                <div class="switch-row">
+                  <span class="lbl">¿Cuándo?<small>Sábado 23</small></span>
+                  <span class="note">Cambiar</span>
+                </div>
+                <div class="switch-row">
+                  <span class="lbl">Se repite cada semana<small>Apagado: es solo por esta vez</small></span>
+                  <span class="sw"></span>
+                </div>
+              </div>
+              <div class="panel">
+                <span class="k">Le va a llegar así</span>
+                <p style="font-size:11.5px">📌 <b>Fabián te pasó un pendiente</b><br>Bañar al perro · sábado</p>
+                <p class="note">Saira puede hacerlo, moverlo de día o decir que no puede. Nada queda "impuesto" en silencio.</p>
+              </div>
+              <button class="btn" type="button">Pasárselo a Saira</button>
+            </div>
+            <div class="nav"><div class="on"><span class="dot"></span>Hoy</div><div><span class="dot"></span>Semana</div><div><span class="dot"></span>Calendario</div><div><span class="dot"></span>Dinero</div><div><span class="dot"></span>Más</div></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="screen-note">
+          <p class="eyebrow">La semana y los pendientes</p>
+          <h3>Todo se puede mover</h3>
+          <p>La semana ya viene armada con lo de siempre. Encima se le agrega lo que salga, para uno mismo o para el otro.</p>
+          <ul>
+            <li><b>Sin día fijo:</b> lavar la ropa y lavar el baño se tienen que hacer en la semana, pero quien las tiene decide qué día — y la ropa puede tomar dos o tres días sin que la app la marque como atrasada.</li>
+            <li><b>Pasarle algo a alguien</b> son tres toques. Le llega con aviso y aparece en sus pendientes, con la puerta abierta a moverlo o decir que no puede.</li>
+            <li><b>Los sábados y domingos que vienen las niñas</b>, se les asigna a mano lo que toque: recoger la mesa, su cuarto, lo que sea. No tienen nada fijo porque no vienen todos los fines.</li>
+          </ul>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-head">
+      <p class="eyebrow">Dinero</p>
+      <h2>Lo que entra, lo que se va y lo que se ahorra</h2>
+      <p>Los dos ven todo. No es para cobrarse nada ni para partir cuentas: es para saber en qué se está yendo el mes. Los fijos —renta, luz, internet, pensión y el ahorro— entran solos y solo hay que confirmarlos.</p>
+    </div>
+
+    <div class="screens">
+      <div class="screen-row pair">
+
+        <div class="phone">
+          <div class="app">
+            <div class="status"><span>13:20</span><span>▮▮▮ 66%</span></div>
+            <div class="app-head"><span class="t">Nuestro</span><span class="s">agosto</span></div>
+            <div class="app-body">
+              <div class="panel">
+                <span class="k">Nos queda del mes</span>
+                <span class="hero-num" style="color:var(--good)">$13,650</span>
+                <div class="kpis">
+                  <div class="kpi"><span class="v">$37,800</span><span class="l">Entró</span></div>
+                  <div class="kpi"><span class="v">$24,150</span><span class="l">Salió</span></div>
+                </div>
+              </div>
+
+              <div class="panel">
+                <span class="k">En qué se fue</span>
+                <div class="barlist">
+                  <div class="row"><div class="top"><span>Ahorro</span><span class="amt">$8,000</span></div><div class="track"><span class="fill g" style="width:100%"></span></div></div>
+                  <div class="row"><div class="top"><span>Pensión de las niñas</span><span class="amt">$6,000</span></div><div class="track"><span class="fill n" style="width:75%"></span></div></div>
+                  <div class="row"><div class="top"><span>Renta</span><span class="amt">$4,500</span></div><div class="track"><span class="fill n" style="width:56%"></span></div></div>
+                  <div class="row"><div class="top"><span>Súper</span><span class="amt">$3,200</span></div><div class="track"><span class="fill n" style="width:40%"></span></div></div>
+                  <div class="row"><div class="top"><span>Luz e internet</span><span class="amt">$1,050</span></div><div class="track"><span class="fill n" style="width:13%"></span></div></div>
+                  <div class="row"><div class="top"><span>Comidas fuera y salidas</span><span class="amt">$1,400</span></div><div class="track"><span class="fill n" style="width:17%"></span></div></div>
+                </div>
+              </div>
+
+              <div class="panel">
+                <span class="k">Quién ha pagado qué</span>
+                <div class="stackbar" role="img" aria-label="Fabián pagó 15,400 pesos y Saira 8,750 pesos">
+                  <span style="background:var(--fa-mark);width:64%"></span>
+                  <span style="background:var(--sa-mark);width:36%"></span>
+                </div>
+                <div class="legend"><span><i style="background:var(--fa-mark)"></i>Fabián $15,400</span><span><i style="background:var(--sa-mark)"></i>Saira $8,750</span></div>
+                <p class="note">Sin deudas ni cobros: es solo la foto de cómo salió el mes.</p>
+              </div>
+            </div>
+            <div class="nav"><div><span class="dot"></span>Hoy</div><div><span class="dot"></span>Semana</div><div><span class="dot"></span>Calendario</div><div class="on"><span class="dot"></span>Dinero</div><div><span class="dot"></span>Más</div></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="phone">
+          <div class="app">
+            <div class="status"><span>13:22</span><span>▮▮▮ 65%</span></div>
+            <div class="app-head"><span class="t">Mi dinero</span><span class="s">Saira · agosto</span></div>
+            <div class="app-body">
+              <div class="panel">
+                <span class="k">Mi meta de la semana</span>
+                <div class="track" style="height:12px"><span class="fill sa" style="width:62%"></span></div>
+                <p style="font-size:12.5px"><b>$2,800</b> de $4,500 · faltan 3 días</p>
+                <p class="note">Como el ingreso es variable, la app no lo da por hecho: se registra lo que va entrando y la meta queda de referencia.</p>
+              </div>
+              <div class="panel">
+                <span class="k">Este mes</span>
+                <div class="kpis">
+                  <div class="kpi"><span class="v">$13,200</span><span class="l">Me entró</span></div>
+                  <div class="kpi"><span class="v">$8,750</span><span class="l">He pagado</span></div>
+                </div>
+                <div class="rule"></div>
+                <table class="mini">
+                  <tr><td>Ahorro</td><td>4,000</td></tr>
+                  <tr><td>Renta (mi parte)</td><td>2,000</td></tr>
+                  <tr><td>Internet</td><td>450</td></tr>
+                  <tr><td>Súper y salidas</td><td>2,300</td></tr>
+                </table>
+              </div>
+              <div class="panel">
+                <span class="k">Fijos que entran solos</span>
+                <p style="font-size:11.5px">Renta día 6 · Internet día 10 · Ahorro cada quincena</p>
+                <p class="note">Solo hay que confirmarlos. Lo demás se registra en cuatro toques cuando pasa.</p>
+              </div>
+            </div>
+            <div class="nav"><div><span class="dot"></span>Hoy</div><div><span class="dot"></span>Semana</div><div><span class="dot"></span>Calendario</div><div class="on"><span class="dot"></span>Dinero</div><div><span class="dot"></span>Más</div></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="screen-note">
+          <p class="eyebrow">Con sus números de verdad</p>
+          <h3>El mes completo, sin hojas de cálculo</h3>
+          <p>Fabián: $12,300 a la quincena, con $3,000 de pensión que sale fijo. Saira: meta de $4,500 a la semana, que se registra conforme entra. Ahorro: $2,000 cada uno por quincena.</p>
+          <ul>
+            <li><b>Los fijos no se capturan</b>: renta el 6, internet el 10, luz cada dos meses, ahorro cada quincena. Solo se confirman.</li>
+            <li><b>El ahorro cuenta como gasto fijo</b>, no como lo que sobró. Así se aparta primero y no se gasta sin querer.</li>
+            <li><b>La meta de Saira es meta, no promesa.</b> La app nunca da por hecho un ingreso variable: enseña lo que de verdad entró y qué tanto falta.</li>
+            <li>Cada gasto puede llevar foto del ticket, para no discutir de memoria.</li>
+          </ul>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-head">
+      <p class="eyebrow">Lo demás</p>
+      <h2>Calendario, recordatorios y los fines de semana</h2>
+    </div>
+
+    <div class="gallery">
+
+      <div class="gal-item">
+        <div class="phone">
+          <div class="app">
+            <div class="status"><span>9:12</span><span>▮▮▮ 84%</span></div>
+            <div class="app-head"><span class="t">Calendario</span><span class="s">agosto</span></div>
+            <div class="app-body">
+              <div class="panel">
+                <span class="k">Lo que viene</span>
+                <div style="display:grid;gap:9px">
+                  <span style="font-size:12px"><b>23 ago</b> · Ir al beisbol · 7:00 pm<br><span class="note">en 3 días · van los dos</span></span>
+                  <div class="rule"></div>
+                  <span style="font-size:12px"><b>14 sep</b> · Cumple de Sofía<br><span class="note">se repite cada año · avisa 5 días antes</span></span>
+                  <div class="rule"></div>
+                  <span style="font-size:12px"><b>2 nov</b> · Nuestro aniversario<br><span class="note">se repite cada año</span></span>
+                </div>
+              </div>
+              <div class="panel">
+                <span class="k">Dos tipos de fecha</span>
+                <p style="font-size:11.5px"><b>Cada año:</b> aniversarios y cumpleaños. Se ponen una vez y vuelven solos.</p>
+                <p style="font-size:11.5px"><b>De una vez:</b> el beisbol, una cena, el del gas. Queda pendiente para los dos y desaparece cuando pasa.</p>
+              </div>
+              <button class="btn ghost" type="button">＋ Agendar algo</button>
+            </div>
+            <div class="nav"><div><span class="dot"></span>Hoy</div><div><span class="dot"></span>Semana</div><div class="on"><span class="dot"></span>Calendario</div><div><span class="dot"></span>Dinero</div><div><span class="dot"></span>Más</div></div>
+          </div>
+        </div>
+        <h3>El calendario de los dos</h3>
+        <p>Lo que se pone aquí lo ven los dos y les avisa antes: los aniversarios y cumpleaños <b>se repiten solos cada año</b>, y un plan como ir al beisbol <b>queda pendiente para ambos</b> hasta que pasa. Lo que viene aparece también en la pantalla de inicio.</p>
+      </div>
+
+      <div class="gal-item">
+        <div class="phone">
+          <div class="app">
+            <div class="status"><span>8:10</span><span>▮▮▮ 88%</span></div>
+            <div class="app-head"><span class="t">Recordar</span><span class="s">los míos</span></div>
+            <div class="app-body">
+              <div class="reminder">
+                <span class="k">Hoy</span>
+                <p class="q">"No dejar pelos en el jabón."</p>
+              </div>
+              <div class="panel">
+                <span class="k">Mis recordatorios</span>
+                <p style="font-size:12px">· No dejar pelos en el jabón</p>
+                <p style="font-size:12px">· Dejar bien tapada la pasta</p>
+                <div class="rule"></div>
+                <p class="note">Solo tú los ves. Saira ve los suyos en su teléfono.</p>
+              </div>
+              <div class="panel">
+                <span class="k">De esta semana</span>
+                <p style="font-size:12px">· El viernes viene el del gas</p>
+                <p class="note">Se va solo cuando pasa el viernes.</p>
+              </div>
+              <button class="btn ghost" type="button">＋ Proponerle uno a Saira</button>
+            </div>
+            <div class="nav"><div><span class="dot"></span>Hoy</div><div><span class="dot"></span>Semana</div><div><span class="dot"></span>Calendario</div><div><span class="dot"></span>Dinero</div><div class="on"><span class="dot"></span>Más</div></div>
+            </div>
+          </div>
+        </div>
+        <h3>Las cosas chiquitas</h3>
+        <p>Cada quien ve <b>solo los suyos</b>, uno o dos al día. Si le proponen uno al otro, le llega para aceptar — mientras no lo acepte, no se muestra. Así es acuerdo entre los dos y no un reclamo.</p>
+      </div>
+
+      <div class="gal-item">
+        <div class="phone">
+          <div class="app">
+            <div class="status"><span>10:05</span><span>▮▮▮ 71%</span></div>
+            <div class="app-head"><span class="t">Hoy</span><span class="s">sábado 23</span></div>
+            <div class="app-body">
+              <div class="panel" style="background:var(--ni-soft);border-color:transparent">
+                <p style="font-size:12.5px;color:var(--ni)"><b>Victoria y Sofía están en casa</b> · sáb y dom</p>
+              </div>
+              <button class="task ni" role="checkbox" aria-checked="true">
+                <span class="av ni">Vi</span><span class="txt"><b>Recoger la mesa</b><small>Victoria · hecho</small></span>
+                <span class="box"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12.5l5.5 5.5L20 6.5"/></svg></span>
+              </button>
+              <button class="task ni" role="checkbox" aria-checked="false">
+                <span class="av ni">So</span><span class="txt"><b>Limpiar su cuarto</b><small>Sofía · antes de la comida</small></span>
+                <span class="box"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12.5l5.5 5.5L20 6.5"/></svg></span>
+              </button>
+              <button class="task sa" role="checkbox" aria-checked="false">
+                <span class="av sa">Sa</span><span class="txt"><b>Lavar el baño</b><small>de esta semana · hoy le tocó</small></span>
+                <span class="box"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12.5l5.5 5.5L20 6.5"/></svg></span>
+              </button>
+              <p class="note" style="padding:2px 4px">Victoria y Sofía usan la misma app que ustedes, sin dinero ni ajustes. Ven lo de todos y palomean lo suyo.</p>
+            </div>
+            <div class="nav"><div class="on"><span class="dot"></span>Hoy</div><div><span class="dot"></span>Semana</div><div><span class="dot"></span>Calendario</div><div><span class="dot"></span>Dinero</div><div><span class="dot"></span>Más</div></div>
+            </div>
+          </div>
+        </div>
+        <h3>Cuando vienen las niñas</h3>
+        <p>No tienen nada fijo, porque no vienen todos los fines. El sábado se les asigna lo que toque y les llega a su teléfono. A los 14 y a los 11 no hay estrellitas ni dibujos: es la misma app, tratadas como parte de la casa.</p>
+      </div>
+
+      <div class="gal-item">
+        <div class="phone">
+          <div class="app">
+            <div class="status"><span>21:30</span><span>▮▮▮ 42%</span></div>
+            <div class="app-head"><span class="t">Domingo</span><span class="s">cerrar la semana</span></div>
+            <div class="app-body">
+              <div class="panel">
+                <span class="k">Cómo nos fue</span>
+                <div class="split" style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+                  <div><span class="hero-num" style="font-size:19px;color:var(--fa)">38</span><p class="note">Fabián palomeó</p></div>
+                  <div><span class="hero-num" style="font-size:19px;color:var(--sa)">34</span><p class="note">Saira palomeó</p></div>
+                </div>
+                <p class="note">Sin porcentajes ni comparación: cocinar tres veces al día no pesa lo mismo que lavar tres veces los trastes, y un número no sabría eso.</p>
+              </div>
+              <div class="panel">
+                <span class="k">La semana que entra</span>
+                <p style="font-size:12px">🐕 Le toca a <b>Saira</b> darle de comer al perro</p>
+                <p style="font-size:12px">👧 Vienen Victoria y Sofía</p>
+                <p style="font-size:12px">💡 Quedó pendiente: cambiar la bombilla</p>
+              </div>
+              <button class="btn" type="button">Listo, cerrar la semana</button>
+            </div>
+            <div class="nav"><div><span class="dot"></span>Hoy</div><div class="on"><span class="dot"></span>Semana</div><div><span class="dot"></span>Calendario</div><div><span class="dot"></span>Dinero</div><div><span class="dot"></span>Más</div></div>
+            </div>
+          </div>
+        </div>
+        <h3>Diez minutos el domingo</h3>
+        <p>Se ve cómo fue la semana, se cambia el turno del perro, se agrega lo suelto de la semana que entra y se cuadra el dinero. Es el único momento en que hay que sentarse con la app.</p>
+      </div>
+
+    </div>
+  </section>
+
+  <div class="closing">
+    <h2>Saira: esto es lo que falta que tú decidas</h2>
+    <p><b>1.</b> Si te late cómo quedó repartido, o si hay algo que preferirías cambiar de lugar. La lista de aquí es la que armó Fabián — nada está fijo hasta que ustedes dos lo den por bueno.</p>
+    <p><b>2.</b> Tus recordatorios: los que aparecen aquí son un ejemplo. Los tuyos los escribes tú, y los que él te proponga te llegan para aceptar o no.</p>
+    <p><b>3.</b> Del dinero: si quieres que tu meta semanal aparezca en la app o prefieres registrar nada más lo que entra, sin meta a la vista.</p>
+    <p><b>4.</b> Cualquier cosa que falte. Esta es la versión de la idea, no la app terminada: mover algo ahorita es escribir un renglón; moverlo después es rehacer una pantalla.</p>
+  </div>
+
+  <footer>Juntos+ · así se vería con sus datos · agosto 2026</footer>
+</div>
+
+<script>
+  (function () {
+    document.querySelectorAll('.task[role="checkbox"]').forEach(function (t) {
+      if (!t.querySelector('.box')) { return; }
+      t.addEventListener('click', function () {
+        t.setAttribute('aria-checked', t.getAttribute('aria-checked') === 'true' ? 'false' : 'true');
+      });
+    });
+  })();
+</script>

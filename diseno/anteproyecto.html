@@ -1,0 +1,1119 @@
+<title>Anteproyecto Juntos+</title>
+<style>
+  :root {
+    --paper:#F4F0EE; --surface:#FDFBFA; --surface-2:#EFE9E6;
+    --ink:#1C2427; --ink-2:#3A4448; --muted:#6E7679; --line:#E1D9D6; --line-2:#D3C9C5;
+    --a:#B93A5B; --a-soft:#F7E3E8;
+    --b:#2F6EB0; --b-soft:#DEE9F6;
+    --k:#9A6712; --k-soft:#F6EAD2;
+    --good:#0F776D; --good-soft:#DCEDEA;
+    --radius:14px;
+    --display:'Iowan Old Style','Palatino Linotype',Palatino,'Book Antiqua',Georgia,serif;
+    --sans:system-ui,-apple-system,'Segoe UI',Roboto,'Helvetica Neue',sans-serif;
+    --mono:ui-monospace,'SF Mono',Menlo,'DejaVu Sans Mono',monospace;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --paper:#12181A; --surface:#1A2124; --surface-2:#242C2F;
+      --ink:#EBE5E2; --ink-2:#C8C2BF; --muted:#98A1A3; --line:#2D3538; --line-2:#3B4448;
+      --a:#EE8398; --a-soft:#3A2229;
+      --b:#79ADE8; --b-soft:#1B2A3C;
+      --k:#E0AE5C; --k-soft:#332A18;
+      --good:#4CBFB0; --good-soft:#12302C;
+    }
+  }
+  :root[data-theme="dark"] {
+    --paper:#12181A; --surface:#1A2124; --surface-2:#242C2F;
+    --ink:#EBE5E2; --ink-2:#C8C2BF; --muted:#98A1A3; --line:#2D3538; --line-2:#3B4448;
+    --a:#EE8398; --a-soft:#3A2229;
+    --b:#79ADE8; --b-soft:#1B2A3C;
+    --k:#E0AE5C; --k-soft:#332A18;
+    --good:#4CBFB0; --good-soft:#12302C;
+  }
+
+  * { box-sizing:border-box; }
+  body { margin:0; background:var(--paper); color:var(--ink); font-family:var(--sans); font-size:16.5px; line-height:1.62; -webkit-font-smoothing:antialiased; }
+  .page { max-width:1180px; margin:0 auto; padding:0 24px 100px; }
+  h1,h2,h3,h4 { font-family:var(--display); font-weight:600; margin:0; text-wrap:balance; letter-spacing:-.01em; }
+  p { margin:0; }
+  ul,ol { margin:0; padding-left:20px; }
+  li { margin-bottom:6px; }
+  li::marker { color:var(--muted); }
+  b,strong { font-weight:600; }
+  code { font-family:var(--mono); font-size:.86em; background:var(--surface-2); padding:1px 5px; border-radius:5px; }
+
+  .eyebrow { font-family:var(--mono); font-size:11px; letter-spacing:.16em; text-transform:uppercase; color:var(--muted); }
+
+  /* portada */
+  header.cover { padding:76px 0 30px; display:grid; gap:20px; border-bottom:1px solid var(--line); }
+  .cover .mark { display:flex; align-items:center; gap:11px; font-family:var(--display); font-size:21px; }
+  .cover h1 { font-size:clamp(34px,5vw,54px); line-height:1.06; max-width:20ch; }
+  .cover .lede { font-size:19px; color:var(--muted); max-width:62ch; }
+  .cover .meta { display:flex; gap:26px; flex-wrap:wrap; font-family:var(--mono); font-size:11.5px; color:var(--muted); letter-spacing:.04em; padding-top:6px; }
+  .cover .meta b { color:var(--ink); font-weight:600; }
+
+  /* layout con índice */
+  .shell { display:grid; grid-template-columns:210px minmax(0,1fr); gap:52px; align-items:start; }
+  .shell > main { min-width:0; }
+  @media (max-width:900px) { .shell { grid-template-columns:1fr; gap:0; } nav.toc { position:static !important; margin:34px 0 0; } }
+  nav.toc { position:sticky; top:26px; padding-top:44px; display:grid; gap:3px; font-size:13.5px; }
+  nav.toc .ttl { font-family:var(--mono); font-size:10px; letter-spacing:.16em; text-transform:uppercase; color:var(--muted); margin-bottom:8px; }
+  nav.toc a { color:var(--muted); text-decoration:none; padding:3px 0; display:flex; gap:9px; }
+  nav.toc a:hover, nav.toc a:focus-visible { color:var(--ink); }
+  nav.toc a span { font-family:var(--mono); font-size:11px; opacity:.7; min-width:16px; }
+
+  section { padding-top:56px; scroll-margin-top:20px; }
+  .sec-title { display:grid; gap:8px; margin-bottom:22px; }
+  .sec-title h2 { font-size:clamp(24px,3vw,31px); }
+  .sec-title .n { font-family:var(--mono); font-size:11.5px; color:var(--a); letter-spacing:.14em; }
+  .sec-title p { color:var(--muted); max-width:66ch; }
+
+  h3 { font-size:20px; margin:30px 0 10px; }
+  h4 { font-size:16.5px; margin:20px 0 6px; font-family:var(--sans); font-weight:600; }
+  section p { max-width:74ch; color:var(--ink-2); }
+  section p + p { margin-top:12px; }
+  section ul, section ol { max-width:74ch; color:var(--ink-2); }
+
+  .grid2 { display:grid; gap:16px; grid-template-columns:repeat(auto-fit,minmax(260px,1fr)); }
+  .box { background:var(--surface); border:1px solid var(--line); border-radius:var(--radius); padding:18px 20px; display:grid; gap:7px; align-content:start; }
+  .box h4 { margin:0; font-size:15.5px; }
+  .box p, .box ul { font-size:14.5px; color:var(--muted); margin:0; }
+  .box .tagline { font-family:var(--mono); font-size:10.5px; letter-spacing:.1em; text-transform:uppercase; color:var(--muted); }
+
+  .callout { border-left:3px solid var(--line-2); background:var(--surface); border-radius:0 var(--radius) var(--radius) 0; padding:15px 18px; display:grid; gap:6px; margin:18px 0; max-width:78ch; }
+  .callout .lbl { font-family:var(--mono); font-size:10px; letter-spacing:.14em; text-transform:uppercase; }
+  .callout p { font-size:15px; color:var(--ink-2); max-width:none; }
+  .callout.risk { border-color:var(--k); background:var(--k-soft); } .callout.risk .lbl { color:var(--k); }
+  .callout.dec { border-color:var(--b); background:var(--b-soft); } .callout.dec .lbl { color:var(--b); }
+  .callout.ask { border-color:var(--a); background:var(--a-soft); } .callout.ask .lbl { color:var(--a); }
+  .callout.ok { border-color:var(--good); background:var(--good-soft); } .callout.ok .lbl { color:var(--good); }
+
+  /* niveles de recomendación */
+  .tier { border-left:3px solid; padding:2px 0 2px 18px; margin:22px 0; display:grid; gap:10px; }
+  .tier h3 { margin:0; font-size:19px; }
+  .tier.must { border-color:var(--a); } .tier.must h3 { color:var(--a); }
+  .tier.should { border-color:var(--b); } .tier.should h3 { color:var(--b); }
+  .tier.could { border-color:var(--k); } .tier.could h3 { color:var(--k); }
+  .tier.wont { border-color:var(--muted); } .tier.wont h3 { color:var(--muted); }
+  .tier .item { display:grid; gap:2px; max-width:76ch; }
+  .tier .item b { font-size:15.5px; }
+  .tier .item span { font-size:14.5px; color:var(--muted); }
+
+  /* tablas */
+  .tw { overflow-x:auto; border:1px solid var(--line); border-radius:var(--radius); background:var(--surface); margin:16px 0; }
+  table { width:100%; border-collapse:collapse; font-size:14px; min-width:520px; }
+  th { text-align:left; font-family:var(--mono); font-size:10px; letter-spacing:.12em; text-transform:uppercase; color:var(--muted); font-weight:400; padding:11px 14px; border-bottom:1px solid var(--line); white-space:nowrap; }
+  td { padding:11px 14px; border-bottom:1px solid var(--line); color:var(--ink-2); vertical-align:top; }
+  tr:last-child td { border-bottom:0; }
+  td code { white-space:nowrap; }
+  td b { color:var(--ink); }
+  .num { font-variant-numeric:tabular-nums; font-family:var(--mono); font-size:13px; }
+
+  /* flujos */
+  .flow { background:var(--surface); border:1px solid var(--line); border-radius:var(--radius); padding:18px 20px; margin:16px 0; display:grid; gap:10px; }
+  .flow h4 { margin:0; font-size:16px; }
+  .flow ol { counter-reset:s; list-style:none; padding:0; display:grid; gap:7px; margin:0; }
+  .flow ol li { counter-increment:s; display:grid; grid-template-columns:22px 1fr; gap:11px; font-size:14.5px; color:var(--ink-2); margin:0; }
+  .flow ol li::before { content:counter(s); font-family:var(--mono); font-size:10.5px; color:var(--muted); border:1px solid var(--line); border-radius:5px; height:19px; display:grid; place-items:center; }
+  .flow .alt { font-size:13.5px; color:var(--muted); border-top:1px dashed var(--line); padding-top:9px; }
+
+  /* fases */
+  .phase { display:grid; grid-template-columns:auto 1fr; gap:18px; background:var(--surface); border:1px solid var(--line); border-radius:var(--radius); padding:17px 19px; margin-bottom:11px; align-items:start; }
+  .phase .n { font-family:var(--mono); font-size:11.5px; color:var(--muted); border:1px solid var(--line); border-radius:7px; padding:3px 8px; white-space:nowrap; }
+  .phase h4 { margin:0 0 3px; font-size:16.5px; }
+  .phase p { font-size:14.5px; color:var(--muted); max-width:70ch; }
+  .phase .dod { font-size:13px; color:var(--good); margin-top:6px; }
+
+  /* nombres */
+  .names { display:grid; gap:14px; }
+  .name-card { background:var(--surface); border:1px solid var(--line); border-radius:var(--radius); padding:18px 20px; display:grid; gap:8px; }
+  .name-card.pick { border-color:var(--a); box-shadow:0 0 0 1px var(--a) inset; }
+  .name-card .top { display:flex; align-items:baseline; gap:12px; flex-wrap:wrap; }
+  .name-card .nm { font-family:var(--display); font-size:25px; }
+  .name-card .badge { font-family:var(--mono); font-size:9.5px; letter-spacing:.12em; text-transform:uppercase; padding:3px 8px; border-radius:999px; background:var(--a-soft); color:var(--a); }
+  .name-card .why { font-size:15px; color:var(--ink-2); }
+  .name-card .pc { display:grid; gap:4px; font-size:14px; }
+  .name-card .pro::before { content:"＋ "; color:var(--good); font-family:var(--mono); }
+  .name-card .con::before { content:"−  "; color:var(--k); font-family:var(--mono); }
+  .name-card .pro, .name-card .con { color:var(--muted); }
+
+  .final { margin-top:60px; padding:28px 26px; border-radius:var(--radius); background:var(--surface); border:1px solid var(--line); display:grid; gap:12px; }
+  .final h2 { font-size:23px; }
+  .final p { color:var(--muted); font-size:15.5px; max-width:74ch; }
+  .final b { color:var(--ink); }
+  footer { margin-top:38px; color:var(--muted); font-size:12.5px; font-family:var(--mono); }
+
+  a { color:var(--b); }
+  :focus-visible { outline:2px solid var(--b); outline-offset:2px; border-radius:3px; }
+  @media (prefers-reduced-motion:reduce) { * { transition:none !important; } }
+</style>
+
+<div class="page">
+
+  <header class="cover">
+    <div class="mark">
+      <svg width="26" height="26" viewBox="0 0 30 30" aria-hidden="true">
+        <circle cx="15" cy="15" r="14" fill="none" stroke="currentColor" stroke-opacity=".22"/>
+        <path d="M8 15.5l4.6 4.6L22 10.5" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      <span>Juntos+</span>
+    </div>
+    <h1>Anteproyecto: de la idea a una app que de verdad se use</h1>
+    <p class="lede">Análisis de producto, crítica honesta de la idea, MVP recortado, experiencia de usuario, arquitectura, modelo de datos, API, seguridad y plan por fases. Sin una línea de código hasta que lo apruebes.</p>
+    <div class="meta">
+      <span><b>Producto</b> · app de convivencia para una pareja con dos hijas</span>
+      <span><b>Usuarios</b> · 2 adultos + 2 niñas</span>
+      <span><b>Estado</b> · propuesta para aprobación</span>
+    </div>
+  </header>
+
+  <div class="shell">
+    <nav class="toc" aria-label="Índice">
+      <p class="ttl">Contenido</p>
+      <a href="#nombres"><span>00</span>Nombres</a>
+      <a href="#analisis"><span>01</span>Análisis</a>
+      <a href="#preguntas"><span>02</span>Preguntas</a>
+      <a href="#mejoras"><span>03</span>Mejoras</a>
+      <a href="#mvp"><span>04</span>MVP</a>
+      <a href="#ux"><span>05</span>Experiencia</a>
+      <a href="#flujos"><span>06</span>Flujos</a>
+      <a href="#ui"><span>07</span>Diseño UI</a>
+      <a href="#arquitectura"><span>08</span>Arquitectura</a>
+      <a href="#datos"><span>09</span>Datos</a>
+      <a href="#api"><span>10</span>API</a>
+      <a href="#seguridad"><span>11</span>Seguridad</a>
+      <a href="#plan"><span>12</span>Plan</a>
+    </nav>
+
+    <main>
+
+      <!-- 00 NOMBRES -->
+      <section id="nombres">
+        <div class="sec-title">
+          <span class="n">00</span>
+          <h2>El nombre: Juntos+</h2>
+          <p>Elegiste <b>Juntos+</b> por la sensación de plataforma integral, y me parece coherente con lo que decidiste construir: una app que desde el arranque lleva tareas, niñas y dinero. Dejo abajo el razonamiento y las opciones que quedaron descartadas, por si algún día se replantea.</p>
+        </div>
+
+        <div class="names">
+          <div class="name-card pick">
+            <div class="top"><span class="nm">Juntos+</span><span class="badge">Elegido</span></div>
+            <p class="why">Dice de entrada que esto no es una lista de pendientes: es todo lo de la casa en un lugar. El "+" comunica que hay más adentro — y con tu decisión de arrancar con los tres módulos, el nombre y el producto se corresponden. Además incluye a las cuatro sin nombrar a nadie.</p>
+            <div class="pc">
+              <span class="pro">Suena a plataforma completa, que es exactamente lo que estás construyendo.</span>
+              <span class="pro">Corto, se dice fácil y funciona igual en la app de las niñas.</span>
+              <span class="con">El "+" no se escribe bien en dominios ni en búsquedas, y a veces se lee como "versión de paga". Si algún día se publica, el dominio sería <code>juntosmas</code> o similar.</span>
+            </div>
+          </div>
+
+          <div class="name-card">
+            <div class="top"><span class="nm">Palomita</span><span class="badge" style="background:var(--surface-2);color:var(--muted)">Descartado</span></div>
+            <p class="why">Venía del verbo que ya usas: <em>palomear</em>. Se explicaba solo, pero apunta a una sola acción — quedaba corto para una app que también lleva dinero y cocina.</p>
+            <div class="pc">
+              <span class="pro">Cariñoso y muy fácil de recordar.</span>
+              <span class="con">Nombra solo las tareas; se confunde con palomitas de maíz.</span>
+            </div>
+          </div>
+
+          <div class="name-card">
+            <div class="top"><span class="nm">Cuenta Conmigo</span><span class="badge" style="background:var(--b-soft);color:var(--b)">La más emocional</span></div>
+            <p class="why">Doble sentido perfecto para esta app: <em>cuentas</em> (el dinero, lo que se lleva registrado) y <em>cuenta conmigo</em> (el apoyo, que es literalmente lo que dijiste que quieres sentir). Es el único nombre de la lista que abraza los dos módulos difíciles: tareas y dinero.</p>
+            <div class="pc">
+              <span class="pro">Comunica el propósito emocional, no la herramienta.</span>
+              <span class="pro">Se puede acortar a "Conmigo" para el ícono y la app.</span>
+              <span class="con">Tres palabras: más largo de escribir y de buscar.</span>
+            </div>
+          </div>
+
+          <div class="name-card">
+            <div class="top"><span class="nm">Trato</span></div>
+            <p class="why">Corto, fuerte y muy mexicano: "es un trato". Cubre acuerdos, reparto de tareas y turnos. Suena a algo que se hace entre dos, no a una lista de pendientes.</p>
+            <div class="pc">
+              <span class="pro">Una palabra, fácil de recordar y de escribir.</span>
+              <span class="con">Un poco seco / contractual para la parte tierna (mensajes, citas).</span>
+            </div>
+          </div>
+
+          <div class="name-card">
+            <div class="top"><span class="nm">Lo Nuestro</span></div>
+            <p class="why">Todo lo que guarda la app es, literal, "lo nuestro": la casa, el dinero, los recuerdos, los acuerdos. Muy natural en el habla diaria.</p>
+            <div class="pc">
+              <span class="pro">Incluye a las niñas sin nombrarlas ni excluirlas.</span>
+              <span class="con">Suena a álbum de fotos; no comunica que hay organización adentro.</span>
+            </div>
+          </div>
+
+          <div class="name-card">
+            <div class="top"><span class="nm">Nido</span></div>
+            <p class="why">Casa, familia, refugio. Corto y cálido, y funciona aunque la familia cambie de tamaño el fin de semana — que es justo su caso.</p>
+            <div class="pc">
+              <span class="pro">Bonito como marca; ícono obvio y memorable.</span>
+              <span class="con">Muy usado por apps de bebés y de bienes raíces.</span>
+            </div>
+          </div>
+
+          <div class="name-card">
+            <div class="top"><span class="nm">Casa Común</span></div>
+            <p class="why">Nombre honesto y adulto: describe el proyecto real, que es administrar una casa entre dos. Sirve especialmente si algún día la abres a otras parejas.</p>
+            <div class="pc">
+              <span class="pro">Serio, claro, no infantil.</span>
+              <span class="con">Le falta cariño; se parece a nombre de condominio.</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="callout ok">
+          <span class="lbl">Decidido</span>
+          <p>El producto se llama <b>Juntos+</b>. Como frase de bienvenida uso <em>"cuenta conmigo"</em>, que aporta el lado emocional sin cargarlo al nombre. La palabra <em>palomear</em> se queda de todas formas: es el verbo de la acción principal dentro de la app.</p>
+        </div>
+        <div class="callout risk">
+          <span class="lbl">Pendiente, solo si algún día se publica</span>
+          <p>No verifiqué dominio ni marcas registradas, y "Juntos" es una palabra muy usada. Si la app se queda entre ustedes, da igual. Si algún día se abre a otras parejas, hay que revisar disponibilidad antes de imprimir nada — media hora de trabajo, no hoy.</p>
+        </div>
+      </section>
+
+      <!-- 01 ANALISIS -->
+      <section id="analisis">
+        <div class="sec-title">
+          <span class="n">01</span>
+          <h2>Análisis de la idea</h2>
+          <p>Qué resuelve, para quién, y dónde la idea tal como está tiene agujeros. Esta sección es deliberadamente crítica: es más barato romper la idea aquí que en el código.</p>
+        </div>
+
+        <h3>El problema real</h3>
+        <p>La idea tal como la contaste mezcla cinco problemas distintos. Vale la pena separarlos porque no tienen la misma urgencia ni la misma dificultad:</p>
+        <ol>
+          <li><b>Coordinación</b> — quién hace qué y cuándo, sin tener que preguntar ni recordar. Es el problema base y el más fácil de resolver bien.</li>
+          <li><b>Carga mental</b> — el trabajo de estar pendiente de que las cosas pasen recae normalmente en una sola persona. Una app mal hecha <em>aumenta</em> esta carga en vez de bajarla, porque ahora además hay que alimentarla.</li>
+          <li><b>Reconocimiento</b> — sentirse visto y apoyado. Esto no lo resuelve una lista; lo resuelve el lenguaje de la app y funciones pequeñas (gracias, "hoy no puedo", mensajes).</li>
+          <li><b>Visibilidad del dinero</b> — no repartir gastos, sino ver a dónde se está yendo entre dos personas que cobran distinto (una al mes, otra por semana).</li>
+          <li><b>Continuidad de la relación</b> — que la logística no se coma lo bonito: citas, antojos, fechas, recuerdos.</li>
+        </ol>
+        <p>El hilo que los une, y que sería la frase de la app: <b>saber qué nos toca y cómo vamos, sin tener que reclamarnos.</b></p>
+
+        <h3>Los usuarios</h3>
+        <div class="tw">
+          <table>
+            <tr><th>Usuario</th><th>Uso</th><th>Qué necesita</th><th>Qué lo haría abandonar</th></tr>
+            <tr><td><b>Tú</b> — la que arma la estructura</td><td>Diario, varias veces</td><td>Crear y mover tareas rápido, ver la semana completa, registrar dinero</td><td>Que capturar cueste trabajo; que la app le sume carga en vez de quitarle</td></tr>
+            <tr><td><b>Tu pareja</b></td><td>Diario, corto</td><td>Ver lo suyo del día y palomear en 5 segundos</td><td>Sentir que es una app para vigilarlo, o que "es la app de ella"</td></tr>
+            <tr><td><b>Tus hijas</b> (sáb y dom)</td><td>2 días por semana</td><td>Ver sus cositas, palomear, sentirse parte</td><td>Texto que no leen, pantallas de adultos, o que no haya nada que ganar</td></tr>
+          </table>
+        </div>
+        <div class="callout risk">
+          <span class="lbl">Riesgo #1, el que mata estas apps</span>
+          <p><b>La app es de dos, pero se diseña como si fuera de una.</b> Si tu pareja no la adopta, la app se vuelve tu lista privada y encima te da la sensación de que "él no participa" — con evidencia numérica. Eso empeora la convivencia, no la mejora. La consecuencia de diseño: su lado tiene que costar <em>casi cero</em> (abrir, ver 3 cosas, palomear) y nunca debe abrirse a una pantalla que lo mida.</p>
+        </div>
+
+        <h3>Objetivo principal</h3>
+        <p>Que la casa funcione sin conversaciones de reclamo, y que abrir la app se sienta bien. Todo lo demás son medios. Como métrica concreta y medible a las seis semanas: <b>los dos palomean al menos cuatro días por semana</b> y el domingo se cierra la semana. Si eso no pasa, ninguna función nueva lo va a arreglar.</p>
+
+        <h3>Funciones que sí son necesarias</h3>
+        <p>Tareas con dueño y día, la repetición semanal con la palomita, la vista de hoy y la vista de semana, palomear en vivo entre los dos, y el acceso de las niñas los fines de semana. Eso, y solo eso, ya resuelve el problema 1 y buena parte del 2.</p>
+
+        <h3>Funciones que sobran, o que cuestan más de lo que dan</h3>
+        <div class="grid2">
+          <div class="box">
+            <span class="tagline">Quitar</span>
+            <h4>Chat propio</h4>
+            <p>Viven en la misma casa y ya tienen WhatsApp. Un chat es de lo más caro que existe (tiempo real, notificaciones, historial, estados) y aquí es lo menos diferencial. Lo valioso no es el chat: son <b>las tarjetas</b> (cita, gracias, acuerdo). Propuesta: las tarjetas viven en la app y se comparten por WhatsApp con un link.</p>
+          </div>
+          <div class="box">
+            <span class="tagline">Aplazar</span>
+            <h4>Balanza con porcentajes</h4>
+            <p>Requiere asignar un "peso" a cada tarea, y nadie va a calibrar eso con honestidad. Peor: un número comparativo entre pareja es un marcador, y los marcadores se ganan y se pierden. En la v1 basta con <b>cuántas hizo cada quien esta semana</b>, sin porcentaje ni juicio.</p>
+          </div>
+          <div class="box">
+            <span class="tagline">Aplazar</span>
+            <h4>Menú con IA</h4>
+            <p>Cuesta dinero por cada sugerencia, necesita internet y propone comida que ustedes no cocinan. El 90% del valor está en <b>su propio recetario</b>: sus platillos con sus ingredientes, que arman la lista del súper solos y gratis.</p>
+          </div>
+          <div class="box">
+            <span class="tagline">Fuera</span>
+            <h4>Metas de lectura y ejercicio</h4>
+            <p>Es un producto distinto compitiendo con apps que lo hacen mejor. Si igual lo quieren, que sea un reto semanal simple de una línea, sin gráficas ni rachas. No merece más.</p>
+          </div>
+        </div>
+
+        <h3>Lo que estás pasando por alto</h3>
+        <ol>
+          <li><b>Quién captura la información.</b> Todas estas apps mueren por captura, no por funciones. Si el dinero exige registrar cada gasto a mano, en tres semanas se abandona. Hay que diseñar para que lo fijo entre solo y lo variable se registre en menos de diez segundos.</li>
+          <li><b>Las niñas y el teléfono.</b> ¿Tienen dispositivo propio? Si no, su "acceso" no puede ser un login con correo: tiene que ser un perfil dentro de tu teléfono, con PIN o sin nada, o una lista impresa. Cuentas de menores con correo son un lío legal y de uso.</li>
+          <li><b>La privacidad del dinero entre ustedes.</b> Dijiste "cada quien ve su resumen y luego el global". Eso implica decidir algo delicado: ¿tu pareja ve <em>cada</em> gasto tuyo, o solo tus totales? No es lo mismo y hay que definirlo antes de programar, porque cambia el modelo de datos y los permisos.</li>
+          <li><b>Qué pasa si se pelean o se separan.</b> Suena feo, pero un dato compartido necesita salida: exportar todo y borrar todo, sin drama y sin pedirle permiso al otro.</li>
+          <li><b>El súper es el peor lugar para tener señal.</b> La lista tiene que funcionar sin internet y sincronizar al salir. Si esto no se diseña desde el principio, no se puede agregar después sin rehacer.</li>
+          <li><b>Los dos tachando al mismo tiempo.</b> Si tú tachas desde la casa y tu pareja desde el súper, la app tiene que resolver el conflicto sola. Es un problema técnico real, resoluble, pero hay que decidirlo temprano.</li>
+          <li><b>Notificaciones en iPhone.</b> Si alguno usa iPhone, las notificaciones de una app web solo funcionan si la instalan en la pantalla de inicio. No es un detalle menor: es la diferencia entre que la app avise o no avise.</li>
+          <li><b>El corte del día y de la semana.</b> ¿A qué hora "termina" el día para una tarea de las 11 de la noche? ¿La semana empieza el lunes? Suena trivial y es de las cosas que hacen que una app se sienta rota.</li>
+          <li><b>El papá de las niñas no entra aquí.</b> Vale la pena decirlo explícitamente: la app es de tu casa. Intentar coordinar con la otra casa multiplica el alcance y mete conflicto que la app no puede resolver.</li>
+        </ol>
+
+        <h3>Riesgos técnicos</h3>
+        <div class="tw">
+          <table>
+            <tr><th>Riesgo</th><th>Impacto</th><th>Cómo lo bajo</th></tr>
+            <tr><td>Sincronizar dos teléfonos con edición offline</td><td>Alto</td><td>Escritura optimista local + cola de cambios + resolución por campo con marca de tiempo. Nada de "el último que guarda borra todo".</td></tr>
+            <tr><td>Notificaciones push (sobre todo iOS)</td><td>Alto</td><td>PWA instalada + Web Push; respaldo con recordatorio a hora fija y resumen por correo si falla.</td></tr>
+            <tr><td>Fricción de captura del dinero</td><td>Alto</td><td>Gastos fijos automáticos, registro en 4 toques, y no exigir que todo esté registrado para que los números sirvan.</td></tr>
+            <tr><td>Tareas repetidas mal modeladas</td><td>Medio</td><td>Separar la <em>plantilla</em> de la <em>ocurrencia</em> desde el día uno; editar y borrar siempre preguntan "¿solo esta vez o siempre?".</td></tr>
+            <tr><td>Mantenimiento a largo plazo</td><td>Medio</td><td>Menos piezas: una sola base de código, un solo servicio de datos, cero microservicios.</td></tr>
+            <tr><td>Datos de menores y datos financieros</td><td>Medio</td><td>Guardar lo mínimo (nombre de pila, sin apellidos ni fotos si no hacen falta), acceso por hogar, cifrado en tránsito y respaldos.</td></tr>
+          </table>
+        </div>
+
+        <h3>Qué simplificaría</h3>
+        <ul>
+          <li><b>Un solo tipo de "tarea"</b> para adultos y niñas, cambiando solo a quién se asigna. Nada de "misiones" como entidad aparte.</li>
+          <li><b>La lista del súper puede vivir sin el menú.</b> Por sí sola ya da la mayor parte del valor; el menú es un lujo posterior.</li>
+          <li><b>Sin chat</b>, como expliqué arriba.</li>
+          <li><b>Dos roles nada más</b>: adulto y niña. Sin permisos finos.</li>
+          <li><b>El calendario de fechas no compite con el del teléfono</b>: guarda la fecha y ofrece un botón para agregarla al calendario que ya usan.</li>
+        </ul>
+
+        <h3>Qué la haría notablemente más útil</h3>
+        <ul>
+          <li>Captura rapidísima: un botón grande de "＋" en todas las pantallas y, más adelante, un widget en la pantalla de inicio.</li>
+          <li>El <b>detalle del día</b> con mensajes escritos por ustedes: es lo más barato de construir y lo que más ganas da de abrir la app.</li>
+          <li>"Hoy no puedo, ¿la tomas tú?" con motivo: convierte un incumplimiento en un acto de apoyo.</li>
+          <li>Imprimir la lista de las niñas: resuelve el fin de semana sin darles pantalla.</li>
+        </ul>
+
+        <h3>Qué la haría demasiado complicada</h3>
+        <p>Presupuestos por categoría con alertas, conexión con el banco, gamificación para adultos, coordinar con la casa del papá, reportes financieros avanzados, un calendario propio completo, roles y permisos configurables, y una IA conversacional que "administre la casa". Cada una de esas suena bien en una lista y en la práctica agrega semanas de trabajo y pantallas que nadie abre.</p>
+      </section>
+
+      <!-- 02 PREGUNTAS -->
+      <section id="preguntas">
+        <div class="sec-title">
+          <span class="n">02</span>
+          <h2>Lo que necesito preguntarte</h2>
+          <p>Solo lo que cambia el diseño o el código. Todo lo demás lo decidí yo y está listado abajo para que lo revises de un vistazo.</p>
+        </div>
+
+        <div class="callout ok">
+          <span class="lbl">Ya decidido por ti</span>
+          <p><b>Nombre:</b> Juntos+. · <b>Alcance de la v1:</b> los tres módulos juntos — tareas, niñas y dinero. · <b>Privacidad del dinero:</b> todo abierto entre ustedes dos. · <b>Acceso de las niñas:</b> cada una con su propio dispositivo. Las consecuencias de cada decisión están aplicadas en las secciones 04, 09, 11 y 12.</p>
+        </div>
+
+        <h3>Lo que todavía necesito saber</h3>
+        <div class="tw">
+          <table>
+            <tr><th>#</th><th>Pregunta</th><th>Por qué importa</th></tr>
+            <tr><td class="num">1</td><td>¿Qué teléfono usa cada quien, Android o iPhone?</td><td>Define si las notificaciones funcionan bien o si hay que instalar la app a la pantalla de inicio sí o sí.</td></tr>
+            <tr><td class="num">2</td><td>¿Tu pareja ya sabe de esto y estaría dispuesto a usarla? ¿Qué le chocaría?</td><td>Es el riesgo número uno del proyecto. Si hay dudas, la v1 se recorta todavía más.</td></tr>
+            <tr><td class="num">3</td><td>¿Qué edad tiene cada una y qué dispositivo usan: tablet o teléfono?</td><td>La edad define si su pantalla lleva dibujos o texto, y el dispositivo define cómo entran sin cuenta de correo.</td></tr>
+            <tr><td class="num">4</td><td>Los nombres reales de los cuatro.</td><td>Para que la app nazca con sus nombres y no con datos de relleno.</td></tr>
+            <tr><td class="num">5</td><td>¿Registran todos los gastos personales o solo los de la casa?</td><td>Define si la app es un gestor de finanzas personales (difícil de sostener) o solo del hogar (sostenible).</td></tr>
+            <tr><td class="num">6</td><td>¿La app es solo para ustedes o piensas publicarla algún día?</td><td>Cambia todo: cuentas, aviso de privacidad, soporte, costos. Hoy asumo que es solo de ustedes.</td></tr>
+            <tr><td class="num">7</td><td>¿Quieres recordatorio a hora fija? ¿A qué hora?</td><td>Es la única notificación que de verdad hace falta en la v1.</td></tr>
+            <tr><td class="num">8</td><td>¿Fotos de tickets y de recuerdos, sí o no?</td><td>Implica almacenamiento, costo y respaldos. Se puede dejar para después sin perder nada.</td></tr>
+            <tr><td class="num">9</td><td>¿Cuántas horas a la semana puedes dedicarle a probarla mientras la construimos?</td><td>Sin uso real durante el desarrollo, la app sale bonita y equivocada.</td></tr>
+          </table>
+        </div>
+
+        <h3>Decisiones que tomé por ti (dime si alguna no te late)</h3>
+        <div class="tw">
+          <table>
+            <tr><th>Tema</th><th>Decisión</th><th>Motivo</th></tr>
+            <tr><td>Plataforma</td><td>Web app instalable (PWA), no app de tienda</td><td>Un solo desarrollo para los dos teléfonos, sin cuentas de desarrollador ni revisiones, y se actualiza al instante.</td></tr>
+            <tr><td>Idioma y moneda</td><td>Español de México, pesos</td><td>Son los únicos usuarios.</td></tr>
+            <tr><td>Semana</td><td>Empieza lunes; el día corta a las 4:00 am</td><td>Una tarea palomeada a la 1 am cuenta para el día anterior, que es como lo vive la gente.</td></tr>
+            <tr><td>Fin de semana</td><td>Sábado y domingo. El viernes es día normal</td><td>Tal como lo corregiste.</td></tr>
+            <tr><td>Chat</td><td>No se construye; las tarjetas se comparten por WhatsApp</td><td>Alto costo, bajo valor diferencial.</td></tr>
+            <tr><td>Banco</td><td>Sin conexión bancaria nunca</td><td>Caro, frágil y con datos muy sensibles. Captura manual asistida.</td></tr>
+            <tr><td>Hogar</td><td>Un solo hogar, sin coordinación con la otra casa</td><td>Contiene el alcance y evita conflicto que la app no puede resolver.</td></tr>
+            <tr><td>Monetización</td><td>Ninguna</td><td>Es una app privada para su familia. Si algún día cambia, se replantea.</td></tr>
+          </table>
+        </div>
+      </section>
+
+      <!-- 03 MEJORAS -->
+      <section id="mejoras">
+        <div class="sec-title">
+          <span class="n">03</span>
+          <h2>Mejoras recomendadas</h2>
+          <p>Ordenadas por qué tanto se necesitan, no por qué tan bonitas suenan.</p>
+        </div>
+
+        <div class="tier must">
+          <h3>Imprescindibles</h3>
+          <div class="item"><b>Crear una tarea en menos de 10 segundos</b><span>Si crear cuesta trabajo, la estructura nunca se llena y la app queda vacía. Tres toques: quién, qué día, se repite o no.</span></div>
+          <div class="item"><b>Editar y borrar preguntando "¿solo esta vez o siempre?"</b><span>Sin esto, un día se borra el machote completo por accidente y se pierde la confianza en la app para siempre.</span></div>
+          <div class="item"><b>Funcionar sin internet y sincronizar después</b><span>El súper, el patio, el coche. Además evita la sensación de app lenta, que es la razón más común de abandono.</span></div>
+          <div class="item"><b>Un lado de la pareja que cueste casi cero</b><span>Abrir, ver tres cosas, palomear, cerrar. Sin métricas en su pantalla de inicio.</span></div>
+          <div class="item"><b>Acceso de las niñas sin cuenta de correo</b><span>Perfil dentro del hogar con PIN opcional. Cuentas de menores con correo son un problema legal y de uso.</span></div>
+          <div class="item"><b>Lenguaje sin reproche en toda la app</b><span>Es una decisión de producto, no de estilo: define copys, colores de estado y qué notificaciones existen.</span></div>
+          <div class="item"><b>Exportar y borrar todo</b><span>Sus datos son suyos, incluyendo el derecho a llevárselos o a que desaparezcan.</span></div>
+        </div>
+
+        <div class="tier should">
+          <h3>Recomendadas</h3>
+          <div class="item"><b>Gastos fijos automáticos</b><span>Renta, escuela, luz. El mes nace armado y solo se captura lo variable: es la diferencia entre sostener el módulo de dinero o abandonarlo.</span></div>
+          <div class="item"><b>Lista del súper con "se me acabó"</b><span>La función más usada de toda la app en cualquier casa, y de las más baratas de construir.</span></div>
+          <div class="item"><b>"Hoy no puedo, ¿la tomas tú?"</b><span>Convierte un incumplimiento en un acto de apoyo, que es exactamente lo que quieres que sienta la pareja.</span></div>
+          <div class="item"><b>Gracias con un toque</b><span>El reconocimiento es la mitad del problema que quieres resolver y aquí cuesta casi nada.</span></div>
+          <div class="item"><b>Fechas importantes con aviso anticipado</b><span>El valor no es la lista, es enterarte cinco días antes, cuando todavía puedes hacer algo.</span></div>
+          <div class="item"><b>Detalle del día con mensajes escritos por ustedes</b><span>Barato de construir y es lo que hace que la app se abra por gusto y no por obligación.</span></div>
+          <div class="item"><b>Copiar la semana pasada</b><span>Resuelve las semanas raras sin obligar a rehacer el machote.</span></div>
+        </div>
+
+        <div class="tier could">
+          <h3>Opcionales</h3>
+          <div class="item"><b>Antojos con etiquetas e historial de lo vivido</b><span>Es el alma de la idea, pero no sostiene la app sola. Va cuando lo básico ya se usa a diario.</span></div>
+          <div class="item"><b>Menú semanal y recetario propio</b><span>Alto valor, costo medio. Se puede lanzar la lista del súper antes y el menú después.</span></div>
+          <div class="item"><b>Acuerdos firmados por los dos (y por las niñas)</b><span>Emocionalmente potente, técnicamente sencillo. Perfecto para una tercera etapa.</span></div>
+          <div class="item"><b>Estrellas y premio de las niñas</b><span>Funciona solo si la estrella se cambia por algo concreto y anunciado desde el viernes.</span></div>
+          <div class="item"><b>Recap mensual</b><span>"En agosto salieron 3 veces y cocinaron 22 comidas en casa." Bonito, prescindible.</span></div>
+          <div class="item"><b>Sugerencias de menú con IA</b><span>Solo encima del recetario propio y solo si ya se está usando la cocina.</span></div>
+        </div>
+
+        <div class="tier wont">
+          <h3>No recomendadas</h3>
+          <div class="item"><b>Chat propio</b><span>Caro, y WhatsApp ya lo hace mejor. Comparte tarjetas hacia allá.</span></div>
+          <div class="item"><b>Balanza con porcentajes ponderados</b><span>Se vuelve marcador y los pesos son imposibles de calibrar con honestidad.</span></div>
+          <div class="item"><b>Conexión con el banco</b><span>Costo alto, integración frágil, datos muy sensibles y ningún beneficio que no dé la captura manual bien diseñada.</span></div>
+          <div class="item"><b>Coordinación con la casa del papá</b><span>Multiplica el alcance y mete a la app en un conflicto que no puede resolver.</span></div>
+          <div class="item"><b>Presupuestos con alertas y reportes financieros</b><span>Ustedes quieren ver a dónde se va el dinero, no un sistema contable que los regañe.</span></div>
+          <div class="item"><b>Roles y permisos configurables</b><span>Son cuatro personas. Dos roles fijos bastan; lo demás es complejidad pura.</span></div>
+          <div class="item"><b>Publicar en tiendas de apps al inicio</b><span>Cuentas de desarrollador, revisiones y actualizaciones lentas para cuatro usuarios.</span></div>
+        </div>
+      </section>
+
+      <!-- 04 MVP -->
+      <section id="mvp">
+        <div class="sec-title">
+          <span class="n">04</span>
+          <h2>El MVP</h2>
+          <p>Elegiste la versión completa: <b>tareas, niñas y dinero en la primera entrega</b>. Es más ambiciosa que mi recomendación, así que la organizo en rebanadas: cada una se termina y se prueba antes de empezar la siguiente, para que nunca haya tres cosas a medias al mismo tiempo.</p>
+        </div>
+
+        <h3>Entra en la v1</h3>
+        <div class="tw">
+          <table>
+            <tr><th>Función</th><th>Alcance exacto</th></tr>
+            <tr><td>Hogar y miembros</td><td>Un hogar, dos adultos (invitación por código), dos perfiles de niñas sin correo.</td></tr>
+            <tr><td>Tareas</td><td>Título, responsable, día de la semana, y el interruptor "se repite cada semana". Nada de subtareas, prioridades ni etiquetas.</td></tr>
+            <tr><td>Vista Hoy</td><td>Lo del día de los tres, palomear y despalomear, botón grande de nueva tarea.</td></tr>
+            <tr><td>Vista Semana</td><td>Lunes a domingo, todo el hogar, mover una tarea de día, pasarla al otro, borrarla con la pregunta de alcance.</td></tr>
+            <tr><td>Fines de semana con las niñas</td><td>Marcar qué findes vienen y un aviso informativo. Nada cambia solo.</td></tr>
+            <tr><td>App de las niñas</td><td>Cada una entra desde su propio dispositivo con un código que tú generas, más PIN. Ve sus tareas del día, palomea y junta estrellas. Dos pantallas, sin puerta hacia lo de adultos.</td></tr>
+            <tr><td>Resumen semanal simple</td><td>Cuántas hizo cada quien esta semana. Sin porcentajes, sin pesos, sin comparación.</td></tr>
+            <tr><td>Dinero</td><td>Registrar ingreso o gasto en cuatro toques, categorías propias, cargos fijos automáticos, resumen personal y resumen conjunto, y el mes semana por semana. Todo visible entre ustedes dos.</td></tr>
+            <tr><td>Notificaciones</td><td>Una diaria a hora fija, y aviso agrupado cuando el otro palomea. Configurables y apagables.</td></tr>
+            <tr><td>Offline y sincronización</td><td>Todo funciona sin señal y se sincroniza al volver.</td></tr>
+          </table>
+        </div>
+
+        <div class="callout risk">
+          <span class="lbl">Lo que implica llevar los tres juntos</span>
+          <p>Es aproximadamente el doble de trabajo y, sobre todo, el doble de superficie que probar antes de confiar en ella. Para que eso no se vuelva un problema, el orden interno de construcción es: <b>tareas → sin conexión y avisos → niñas → dinero</b>, y recién entonces el piloto de dos semanas. Si a media construcción notas que las tareas ya te sirven y quieres usarlas antes, se puede soltar esa rebanada sola sin esperar al resto.</p>
+        </div>
+
+        <h3>Se va a la v2</h3>
+        <p>Lista del súper con despensa, fechas importantes con aviso anticipado, "hoy no puedo", gracias, el detalle del día con mensajes de ustedes, y el menú con recetario.</p>
+
+        <h3>Se va a la v3</h3>
+        <p>Antojos con etiquetas e historial vivido, acuerdos firmados, tarjetas de cita que se comparten por WhatsApp, premios canjeables de las niñas y recap mensual.</p>
+
+        <h3>No se desarrolla</h3>
+        <p>Todo lo de la lista "No recomendadas" de la sección anterior. Si dentro de seis meses alguna se vuelve necesaria, se replantea con datos de uso reales — no antes.</p>
+      </section>
+
+      <!-- 05 UX -->
+      <section id="ux">
+        <div class="sec-title">
+          <span class="n">05</span>
+          <h2>Experiencia de usuario</h2>
+          <p>Pantalla por pantalla, con los estados que casi siempre se olvidan: vacío, cargando, error y confirmación.</p>
+        </div>
+
+        <h3>Arquitectura de navegación</h3>
+        <p>Cinco pestañas fijas abajo, al alcance del pulgar: <b>Hoy · Semana · Cocina · Dinero · Nosotros</b>. En la v1 existen Hoy, Semana y Dinero; Cocina y Nosotros aparecen cuando se construyan, para que la app nunca muestre pestañas muertas. Sin menú de hamburguesa: en una app de cinco secciones, esconder la navegación es empeorarla.</p>
+
+        <h3>Pantallas</h3>
+        <div class="tw">
+          <table>
+            <tr><th>Pantalla</th><th>Qué hace el usuario</th><th>Detalles que importan</th></tr>
+            <tr><td><b>Bienvenida</b></td><td>Elegir "crear nuestro hogar" o "tengo un código"</td><td>Una sola pantalla, sin carrusel de publicidad. Frase: "Cuenta conmigo".</td></tr>
+            <tr><td><b>Entrar</b></td><td>Correo y contraseña, o link mágico al correo</td><td>La sesión no se cierra nunca sola. Cambiar de perfil a "niña" no pide contraseña, solo PIN de 4 dígitos si lo activan.</td></tr>
+            <tr><td><b>Armado inicial</b></td><td>Nombres, quién es quién, y cargar el machote base</td><td>Máximo 3 pasos, con opción de "lo lleno después". Ofrece plantilla de tareas comunes para no empezar en blanco.</td></tr>
+            <tr><td><b>Hoy</b> (inicio)</td><td>Ver lo del día, palomear, agregar</td><td>Es el tablero. Arriba: fecha, aviso del finde si aplica y el detalle del día. En medio: las tareas. Abajo: ＋ flotante.</td></tr>
+            <tr><td><b>Semana</b></td><td>Ver y reacomodar los siete días</td><td>Las repetidas llevan ↻; las sueltas, línea punteada. Tocar abre acciones: mover, pasar al otro, editar, borrar.</td></tr>
+            <tr><td><b>Nueva tarea</b> (hoja)</td><td>Escribir, elegir quién y qué día, decidir si se repite</td><td>Se abre desde abajo sin cambiar de pantalla. El interruptor de repetir explica en una línea qué pasa si se apaga.</td></tr>
+            <tr><td><b>Dinero</b></td><td>Ver "Mío" o "Nuestro", registrar movimiento</td><td>Dos pestañas internas. El número grande responde una sola pregunta: cuánto queda. Lo demás está debajo.</td></tr>
+            <tr><td><b>Cocina</b></td><td>Menú, súper, despensa</td><td>El súper es lo primero que se abre, no el menú: es lo que se usa fuera de casa.</td></tr>
+            <tr><td><b>Nosotros</b></td><td>Antojos, fechas, acuerdos, mensajes</td><td>Es la pestaña "por gusto". Nunca debe tener números de desempeño.</td></tr>
+            <tr><td><b>Vista de niña</b></td><td>Ver sus cositas y palomear</td><td>Texto grande, dibujo por tarea, dos pantallas máximo. Sin ninguna puerta hacia las pantallas de adultos.</td></tr>
+            <tr><td><b>Ajustes</b></td><td>Notificaciones, miembros, exportar, borrar</td><td>Poco y claro. Aquí vive el botón de "modo tregua".</td></tr>
+          </table>
+        </div>
+
+        <h3>Formularios, botones y filtros</h3>
+        <ul>
+          <li><b>Formularios cortos o nada.</b> Crear tarea: un campo de texto y dos selectores. Registrar gasto: monto, categoría, quién pagó. Todo lo demás es opcional y está plegado.</li>
+          <li><b>Un solo botón principal por pantalla</b>, siempre en el mismo lugar y con verbo: "Guardar", "Registrar", "Invitar". Los secundarios son texto, no botones grises.</li>
+          <li><b>Área tocable mínima de 44 px</b> y palomita separada del cuerpo de la tarea, para no palomear por accidente al querer editar.</li>
+          <li><b>Filtros solo donde hay volumen</b>: antojos (comer/salir/con niñas) y dinero (mes, categoría). En tareas no hacen falta; la semana ya es el filtro.</li>
+          <li><b>Buscador solo en antojos y recetario.</b> En una lista de doce tareas, buscar es peor que mirar.</li>
+        </ul>
+
+        <h3>Mensajes, confirmaciones y errores</h3>
+        <div class="tw">
+          <table>
+            <tr><th>Situación</th><th>Qué muestra la app</th><th>Regla</th></tr>
+            <tr><td>Palomear</td><td>Nada. La tarea se tacha y listo</td><td>Confirmar lo reversible es ruido. Hay "deshacer" cinco segundos.</td></tr>
+            <tr><td>Borrar tarea repetida</td><td>"¿Borrar solo la de este jueves o todas las que vienen?"</td><td>Es la única confirmación obligatoria de la v1.</td></tr>
+            <tr><td>Sin conexión</td><td>Cinta discreta: "Sin señal. Se guarda y se sincroniza solo."</td><td>Nunca bloquear la app ni perder lo escrito.</td></tr>
+            <tr><td>Falla al guardar</td><td>"No se pudo guardar. Lo dejamos pendiente y lo reintentamos." + botón Reintentar</td><td>Explicar qué pasó y qué sigue. Nunca códigos de error.</td></tr>
+            <tr><td>Código de invitación inválido</td><td>"Ese código no existe o ya se usó. Pídele a tu pareja que genere uno nuevo."</td><td>Decir la salida, no solo el problema.</td></tr>
+            <tr><td>Monto vacío o raro</td><td>Aviso bajo el campo, en el momento, sin borrar lo escrito</td><td>Validar mientras se escribe, no al enviar.</td></tr>
+          </table>
+        </div>
+
+        <h3>Estados vacíos y de carga</h3>
+        <ul>
+          <li><b>Hoy sin nada:</b> "Hoy no hay pendientes. Disfrútenlo." con un ＋ discreto. No una ilustración enorme ni un regaño.</li>
+          <li><b>Semana en blanco (primer uso):</b> ofrece cargar una plantilla de tareas comunes o copiar de la semana pasada.</li>
+          <li><b>Dinero sin movimientos:</b> "Registra el primero y en dos semanas ya se ve el patrón." Explica el beneficio, no la mecánica.</li>
+          <li><b>Antojos vacío:</b> "Guarda el próximo lugar que se les antoje. Al rato esto se vuelve su historial."</li>
+          <li><b>Cargando:</b> esqueletos con la forma real del contenido, nunca una rueda girando a pantalla completa. Como la app es offline-first, casi siempre pinta al instante con lo local y actualiza en silencio.</li>
+        </ul>
+
+        <h3>Notificaciones</h3>
+        <p>Tres tipos, y ninguno más: <b>recordatorio diario</b> a la hora que ustedes elijan; <b>aviso de que el otro palomeó</b>, agrupado una vez al día para no vibrar diez veces; y <b>avisos de fecha importante</b> con cinco días de anticipación. Todas se pueden apagar por separado. Regla de redacción: la notificación describe un hecho, nunca evalúa a una persona.</p>
+
+        <div class="callout ok">
+          <span class="lbl">Accesibilidad</span>
+          <p>Texto base de 16 px, contraste alto en ambos temas, nada que dependa solo del color (la palomita también tacha el texto), soporte de tema oscuro del sistema, y tipografía que crece si el teléfono está configurado en letra grande. La vista de las niñas usa texto de 20 px y un dibujo por tarea.</p>
+        </div>
+      </section>
+
+      <!-- 06 FLUJOS -->
+      <section id="flujos">
+        <div class="sec-title">
+          <span class="n">06</span>
+          <h2>Flujos principales</h2>
+          <p>Paso a paso, incluyendo lo que pasa cuando algo sale mal.</p>
+        </div>
+
+        <div class="flow">
+          <h4>A · Arranque del hogar (una sola vez)</h4>
+          <ol>
+            <li>Abres la app → Bienvenida → "Crear nuestro hogar".</li>
+            <li>Te registras con correo y contraseña. Se crea el hogar y quedas como adulta.</li>
+            <li>La app genera un código de invitación de seis caracteres y te ofrece compartirlo por WhatsApp.</li>
+            <li>Tu pareja abre el link, se registra y entra al mismo hogar. Ya son dos.</li>
+            <li>Agregas a las niñas como perfiles: nombre y edad. Sin correo, sin contraseña.</li>
+            <li>Cargas el machote: eliges de una plantilla o escribes las tuyas. Cada una con su día y su interruptor de repetir.</li>
+          </ol>
+          <p class="alt">Si el otro no acepta la invitación, la app funciona igual para ti sola y el código sigue vivo. No se bloquea nada.</p>
+        </div>
+
+        <div class="flow">
+          <h4>B · Día normal (el flujo que ocurre 300 veces al año)</h4>
+          <ol>
+            <li>Llega el recordatorio a la hora fijada, o abres la app directo.</li>
+            <li>Se abre en Hoy: primero el detalle del día, luego tus tareas y las del otro.</li>
+            <li>Palomeas lo hecho. Se tacha al instante, sin esperar al servidor.</li>
+            <li>Tu pareja lo ve reflejado en su teléfono; recibe un solo aviso agrupado al final del día.</li>
+            <li>Si algo no se hizo, ahí se queda: pasa a mañana marcado como pendiente, sin alerta roja.</li>
+          </ol>
+          <p class="alt">Sin señal: todo funciona igual y se sincroniza cuando vuelve. Si los dos tocaron lo mismo, gana la marca de tiempo más reciente y nada se pierde.</p>
+        </div>
+
+        <div class="flow">
+          <h4>C · Crear una tarea que se repite</h4>
+          <ol>
+            <li>Tocas el ＋ desde cualquier pantalla.</li>
+            <li>Escribes "Lavar y tender la ropa".</li>
+            <li>Eliges de quién es y qué día.</li>
+            <li>Dejas encendido "Se repite cada semana". La app explica en una línea qué significa apagarlo.</li>
+            <li>Guardas. Aparece este sábado y en todos los que vienen.</li>
+          </ol>
+        </div>
+
+        <div class="flow">
+          <h4>D · Editar o borrar una repetida (el flujo que más se rompe en otras apps)</h4>
+          <ol>
+            <li>Tocas la tarea en la vista Semana.</li>
+            <li>Eliges Mover, Pasar al otro, Editar o Borrar.</li>
+            <li>La app pregunta: <b>¿solo esta semana o de aquí en adelante?</b></li>
+            <li>Si eliges "solo esta semana", la plantilla no se toca y se guarda una excepción para esa fecha.</li>
+            <li>Si eliges "de aquí en adelante", se cierra la plantilla vieja y nace una nueva. El historial pasado no se altera.</li>
+          </ol>
+          <p class="alt">Nunca se borra hacia el pasado: lo que ya se palomeó queda como registro.</p>
+        </div>
+
+        <div class="flow">
+          <h4>E · "Hoy no puedo" (v2)</h4>
+          <ol>
+            <li>Deslizas la tarea y eliges "Hoy no puedo".</li>
+            <li>Escribes un motivo corto, opcional.</li>
+            <li>Le llega al otro como petición, no como falla.</li>
+            <li>Si acepta, la tarea cambia de dueño solo por hoy y queda anotado quién cubrió.</li>
+            <li>Si no contesta, la tarea vuelve a ti al final del día, sin escándalo.</li>
+          </ol>
+        </div>
+
+        <div class="flow">
+          <h4>F · Fin de semana con las niñas</h4>
+          <ol>
+            <li>El jueves aparece el aviso: "Este fin de semana vienen".</li>
+            <li>Si quieres, les agregas tareas para sábado o domingo, igual que a un adulto.</li>
+            <li>El sábado, una de ellas entra a su perfil desde tu teléfono (o desde el suyo, si tienen).</li>
+            <li>Ve sus cositas con dibujos, palomea, gana estrella.</li>
+            <li>Si no les pusiste nada, su pantalla dice que hoy no hay nada que hacer.</li>
+          </ol>
+        </div>
+
+        <div class="flow">
+          <h4>G · Registrar dinero (v2)</h4>
+          <ol>
+            <li>＋ desde Dinero → "Gasté" o "Me pagaron".</li>
+            <li>Monto, categoría y listo. La fecha es hoy y quien registra es quien pagó, salvo que lo cambies.</li>
+            <li>Se refleja de inmediato en tu resumen y en el conjunto.</li>
+            <li>Los gastos fijos entran solos en su fecha y solo hay que confirmarlos.</li>
+          </ol>
+          <p class="alt">Regla firme: la app nunca calcula deudas entre ustedes ni dice quién debe qué.</p>
+        </div>
+
+        <div class="flow">
+          <h4>H · Ritual del domingo (10 minutos)</h4>
+          <ol>
+            <li>La app avisa el domingo a la hora que hayan elegido.</li>
+            <li>Muestra cuántas tareas hizo cada quien esta semana, sin comparación ni juicio.</li>
+            <li>Pregunta si vienen las niñas el próximo finde.</li>
+            <li>Deja agregar los pendientes sueltos de la semana que entra.</li>
+            <li>(v2) Cierra el dinero de la semana y arma la lista del súper.</li>
+            <li>Termina mostrando las fechas importantes de las próximas dos semanas.</li>
+          </ol>
+        </div>
+      </section>
+
+      <!-- 07 UI -->
+      <section id="ui">
+        <div class="sec-title">
+          <span class="n">07</span>
+          <h2>Diseño visual</h2>
+          <p>El objetivo no es que se vea bonita: es que a las seis de la mañana, con una mano y sin lentes, se entienda de un vistazo.</p>
+        </div>
+
+        <h3>Estilo</h3>
+        <p>Papel cálido y tinta oscura, no el azul frío de las apps de trabajo. Tarjetas de bordes suaves sobre un fondo tenue, mucho aire entre bloques y una sola cosa importante por pantalla. Cero ilustraciones decorativas: el espacio se usa para que el dedo no falle.</p>
+
+        <h3>Color</h3>
+        <p>El color es identidad, no decoración: <b>cada persona tiene el suyo</b> y ese color aparece en su avatar, en su palomita y en sus barras de dinero. Los tres tonos están validados para daltonismo con separación suficiente entre pares (por eso la pareja quedó en azul y no en verde), y ninguna información depende solo del color.</p>
+        <div class="tw">
+          <table>
+            <tr><th>Rol</th><th>Claro</th><th>Oscuro</th><th>Uso</th></tr>
+            <tr><td>Tú</td><td><code>#B93A5B</code></td><td><code>#D9647F</code></td><td>Avatar, palomita, barras y burbujas propias</td></tr>
+            <tr><td>Tu pareja</td><td><code>#2F6EB0</code></td><td><code>#4A8BD4</code></td><td>Lo mismo, de su lado</td></tr>
+            <tr><td>Las niñas</td><td><code>#9A6712</code></td><td><code>#E0AE5C</code></td><td>Sus tareas, estrellas y el aviso del finde</td></tr>
+            <tr><td>Positivo</td><td><code>#0F776D</code></td><td><code>#4CBFB0</code></td><td>"Queda", cumplido, sincronizado</td></tr>
+            <tr><td>Papel / tinta</td><td><code>#F4F0EE</code> / <code>#1C2427</code></td><td><code>#12181A</code> / <code>#EBE5E2</code></td><td>Fondo y texto</td></tr>
+          </table>
+        </div>
+        <p>Nada se pinta de rojo. Lo atrasado usa el ámbar de las niñas en tono suave: informa sin alarmar. El rojo queda reservado para acciones destructivas (borrar), donde sí debe dar un poco de miedo.</p>
+
+        <h3>Tipografía</h3>
+        <ul>
+          <li><b>Cuerpo e interfaz:</b> la tipografía del sistema (San Francisco en iPhone, Roboto en Android). Carga instantánea, se ve nativa y respeta el tamaño de letra que cada quien tiene configurado.</li>
+          <li><b>Títulos:</b> una serif cálida para encabezados de pantalla y números grandes. Es lo que hace que no parezca una app de trabajo — y se usa poco, solo en títulos.</li>
+          <li><b>Números:</b> siempre en tipografía monoespaciada con cifras de ancho fijo, para que las columnas de dinero no bailen.</li>
+          <li><b>Escala:</b> 12 · 14 · 16 · 20 · 26 · 34. Nada intermedio.</li>
+        </ul>
+
+        <h3>Componentes base</h3>
+        <div class="tw">
+          <table>
+            <tr><th>Componente</th><th>Reglas</th></tr>
+            <tr><td>Tarjeta de tarea</td><td>Avatar de color, título, línea de detalle, palomita a la derecha separada. Alto mínimo 56 px. Tocar el cuerpo abre acciones; tocar la palomita completa.</td></tr>
+            <tr><td>Botón principal</td><td>Uno por pantalla, ancho completo o flotante, verbo en presente. Estado presionado y estado cargando incorporados.</td></tr>
+            <tr><td>Hoja inferior</td><td>Para crear y editar. Nunca una pantalla nueva para tres campos.</td></tr>
+            <tr><td>Pestañas internas</td><td>Máximo tres (Mío/Nuestro, Menú/Súper/Despensa). Si hacen falta más, la pantalla está mal planteada.</td></tr>
+            <tr><td>Tablas</td><td>Solo en dinero, máximo tres columnas en teléfono, con scroll horizontal propio. Cifras alineadas a la derecha.</td></tr>
+            <tr><td>Barras</td><td>Delgadas, extremos redondeados, 2 px de separación entre segmentos, con leyenda y cifra escrita — la barra acompaña al número, no lo sustituye.</td></tr>
+            <tr><td>Iconos</td><td>De línea, trazo constante, siempre acompañados de texto en la navegación. Emojis solo en contenido de las niñas.</td></tr>
+            <tr><td>Espaciado</td><td>Múltiplos de 4. Entre bloques: 16 o 24. Márgenes laterales: 16 en teléfono.</td></tr>
+          </table>
+        </div>
+
+        <h3>Responsive</h3>
+        <ul>
+          <li><b>Teléfono (lo importante):</b> una columna, navegación abajo, acciones al alcance del pulgar, nada crítico en la parte superior de la pantalla.</li>
+          <li><b>Tablet:</b> dos columnas — la semana a la izquierda, el día seleccionado a la derecha.</li>
+          <li><b>Escritorio:</b> misma app centrada con ancho máximo, navegación pasa al costado izquierdo. No se rediseña; se acomoda. Útil sobre todo para el domingo, cuando se arma la semana con calma.</li>
+        </ul>
+      </section>
+
+      <!-- 08 ARQUITECTURA -->
+      <section id="arquitectura">
+        <div class="sec-title">
+          <span class="n">08</span>
+          <h2>Arquitectura técnica</h2>
+          <p>Criterio de selección, en este orden: que funcione en los dos teléfonos, que se pueda mantener por una sola persona, y que no cueste dinero mensual para cuatro usuarios.</p>
+        </div>
+
+        <h3>Tipo de aplicación</h3>
+        <div class="tw">
+          <table>
+            <tr><th>Opción</th><th>Veredicto</th><th>Motivo</th></tr>
+            <tr><td><b>PWA instalable</b></td><td><b>Elegida</b></td><td>Una sola base de código para iPhone, Android y escritorio. Se instala desde el navegador, se actualiza al instante y no depende de tiendas. Soporta offline y notificaciones.</td></tr>
+            <tr><td>App nativa (Swift/Kotlin)</td><td>No</td><td>Dos desarrollos, dos cuentas de desarrollador de paga, revisiones de días. Para cuatro usuarios no se justifica.</td></tr>
+            <tr><td>React Native / Flutter</td><td>No por ahora</td><td>Una sola base, pero sigue exigiendo tiendas y firmas. Es el camino natural <em>si</em> algún día se publica.</td></tr>
+            <tr><td>Escritorio (Electron)</td><td>No</td><td>El uso real es en la cocina y en el súper, con el teléfono en la mano.</td></tr>
+          </table>
+        </div>
+
+        <h3>Forma del sistema</h3>
+        <p><b>Monolito modular.</b> Una aplicación, con módulos separados por dominio (tareas, dinero, cocina, nosotros) que no se llaman entre sí más que por sus bordes. Microservicios aquí serían un error caro: multiplican piezas, despliegues y fallas para un sistema con cuatro usuarios y sin picos de tráfico. La modularidad da el beneficio real (poder tocar dinero sin romper tareas) sin el costo operativo.</p>
+
+        <h3>Tecnologías concretas</h3>
+        <div class="tw">
+          <table>
+            <tr><th>Capa</th><th>Elección</th><th>Por qué esta y no otra</th></tr>
+            <tr><td>Frontend</td><td>React + TypeScript con Vite</td><td>TypeScript evita una clase entera de errores en un proyecto que va a crecer por partes. Vite hace el desarrollo instantáneo. React porque es lo que mejor documentado está para lo que sigue.</td></tr>
+            <tr><td>Estilos</td><td>CSS con variables de tema (tokens)</td><td>Los colores ya están definidos como tokens; el tema claro/oscuro sale gratis y no se arrastra una librería pesada.</td></tr>
+            <tr><td>Datos locales</td><td>IndexedDB con Dexie + cola de cambios</td><td>Es lo que hace que la app funcione sin señal y se sienta instantánea. Es una decisión de arranque, no un agregado posterior.</td></tr>
+            <tr><td>Servidor y datos</td><td>Supabase (PostgreSQL gestionado)</td><td>Da base de datos, autenticación, tiempo real, almacenamiento y seguridad por fila sin escribir un backend entero. Para este tamaño, el plan gratuito alcanza. Y si algún día hay que salirse, abajo hay un Postgres estándar: no queda secuestrado.</td></tr>
+            <tr><td>Alternativa de servidor</td><td>Node + Fastify + Prisma en Fly.io</td><td>Solo si prefieres control total del backend. Cuesta más trabajo y más mantenimiento; el beneficio no se nota a esta escala.</td></tr>
+            <tr><td>Tiempo real</td><td>Suscripciones de Postgres (Supabase Realtime)</td><td>Es lo que hace que la palomita aparezca en el otro teléfono sin recargar. Ya viene incluido.</td></tr>
+            <tr><td>Autenticación</td><td>Correo y contraseña, o link mágico</td><td>Sin redes sociales: menos dependencias y menos datos de terceros. Las niñas no tienen cuenta, son perfiles del hogar.</td></tr>
+            <tr><td>Autorización</td><td>Seguridad a nivel de fila en la base de datos</td><td>La regla vive en la base, no en el código de pantalla: aunque alguien manipule la app, no puede leer datos de otro hogar.</td></tr>
+            <tr><td>Archivos</td><td>Bucket privado con URLs firmadas</td><td>Fotos de tickets y recuerdos nunca públicas. Se puede posponer sin costo.</td></tr>
+            <tr><td>Notificaciones</td><td>Web Push con service worker</td><td>Requiere que la app esté instalada en el teléfono, sobre todo en iPhone. Respaldo: recordatorio local y resumen por correo.</td></tr>
+            <tr><td>Errores y registro</td><td>Sentry (plan gratuito) + registro de auditoría propio</td><td>Para enterarte de fallas sin que ustedes tengan que reportarlas.</td></tr>
+            <tr><td>Despliegue</td><td>Vercel o Netlify + Supabase</td><td>Despliegue automático al hacer push, certificados y CDN incluidos, costo cero a este tamaño.</td></tr>
+            <tr><td>Integraciones</td><td>Compartir a WhatsApp, archivo <code>.ics</code> para el calendario</td><td>Ambas son estándar del teléfono, sin API ni llaves. Nada de integraciones que se puedan caer.</td></tr>
+            <tr><td>IA (opcional, v3)</td><td>Claude API llamada desde el servidor</td><td>Solo para sugerir menús con lo que hay en la despensa. La llave nunca en el teléfono, y con tope de gasto.</td></tr>
+          </table>
+        </div>
+
+        <div class="callout risk">
+          <span class="lbl">La decisión técnica que hay que tomar bien desde el día uno</span>
+          <p><b>Offline y sincronización.</b> Todo lo demás se puede cambiar después; esto no. La app escribe primero en el teléfono, encola el cambio y sincroniza cuando puede. Los conflictos se resuelven por campo con marca de tiempo, y las acciones que se repiten (palomear, tachar del súper) se diseñan para que aplicarlas dos veces dé el mismo resultado.</p>
+        </div>
+      </section>
+
+      <!-- 09 DATOS -->
+      <section id="datos">
+        <div class="sec-title">
+          <span class="n">09</span>
+          <h2>Modelo de datos</h2>
+          <p>PostgreSQL. Todas las tablas cuelgan de un hogar, todas llevan identificador único, fecha de creación y de modificación, y borrado suave donde el historial importa.</p>
+        </div>
+
+        <h3>Entidades del MVP</h3>
+        <div class="tw">
+          <table>
+            <tr><th>Entidad</th><th>Propósito</th><th>Campos principales</th><th>Relaciones</th></tr>
+            <tr>
+              <td><b>hogar</b></td>
+              <td>La unidad que agrupa todo y la frontera de seguridad</td>
+              <td><code>id</code> uuid · <code>nombre</code> texto · <code>zona_horaria</code> texto · <code>inicio_semana</code> entero · <code>hora_corte</code> hora</td>
+              <td>Tiene muchos miembros y todo lo demás</td>
+            </tr>
+            <tr>
+              <td><b>miembro</b></td>
+              <td>Cada persona del hogar, adulta o niña</td>
+              <td><code>id</code> uuid · <code>hogar_id</code> uuid · <code>usuario_id</code> uuid nulo · <code>nombre</code> texto · <code>rol</code> enum(adulto, niña) · <code>color</code> texto · <code>pin</code> hash nulo · <code>activo</code> booleano</td>
+              <td>Pertenece a un hogar; puede o no tener cuenta</td>
+            </tr>
+            <tr>
+              <td><b>tarea_plantilla</b></td>
+              <td>La tarea que se repite: el machote</td>
+              <td><code>id</code> · <code>hogar_id</code> · <code>titulo</code> texto · <code>miembro_id</code> uuid · <code>dias</code> arreglo de enteros (1=lunes) · <code>desde</code> fecha · <code>hasta</code> fecha nula · <code>activa</code> booleano</td>
+              <td>Genera muchas ocurrencias</td>
+            </tr>
+            <tr>
+              <td><b>tarea</b></td>
+              <td>La ocurrencia real de un día: lo que se palomea</td>
+              <td><code>id</code> · <code>hogar_id</code> · <code>plantilla_id</code> nulo · <code>titulo</code> · <code>miembro_id</code> · <code>fecha</code> fecha · <code>estado</code> enum(pendiente, hecha, cancelada) · <code>hecha_en</code> marca de tiempo · <code>hecha_por</code> uuid · <code>origen</code> enum(plantilla, suelta)</td>
+              <td>Puede venir de una plantilla o ser suelta</td>
+            </tr>
+            <tr>
+              <td><b>excepcion_plantilla</b></td>
+              <td>El "solo por esta semana" sin tocar el machote</td>
+              <td><code>id</code> · <code>plantilla_id</code> · <code>fecha</code> · <code>tipo</code> enum(omitida, movida, reasignada) · <code>nueva_fecha</code> · <code>nuevo_miembro_id</code></td>
+              <td>Pertenece a una plantilla</td>
+            </tr>
+            <tr>
+              <td><b>visita_finde</b></td>
+              <td>Qué fines de semana vienen las niñas</td>
+              <td><code>id</code> · <code>hogar_id</code> · <code>fecha_inicio</code> · <code>fecha_fin</code> · <code>miembros</code> arreglo uuid</td>
+              <td>Solo informativa: no dispara automatismos</td>
+            </tr>
+            <tr>
+              <td><b>dispositivo</b></td>
+              <td>Cómo entra cada niña desde su tablet o teléfono, sin correo</td>
+              <td><code>id</code> · <code>hogar_id</code> · <code>miembro_id</code> · <code>codigo</code> texto (un solo uso) · <code>nombre_dispositivo</code> · <code>vinculado_en</code> · <code>ultimo_uso</code> · <code>revocado</code> booleano</td>
+              <td>Pertenece a un miembro con rol niña</td>
+            </tr>
+            <tr>
+              <td><b>invitacion</b></td>
+              <td>Sumar a la pareja al hogar</td>
+              <td><code>id</code> · <code>hogar_id</code> · <code>codigo</code> texto · <code>expira</code> · <code>usada_por</code> · <code>usada_en</code></td>
+              <td>Un solo uso, caduca en 7 días</td>
+            </tr>
+          </table>
+        </div>
+
+        <h3>Entidades de la v2 y v3</h3>
+        <div class="tw">
+          <table>
+            <tr><th>Entidad</th><th>Propósito</th><th>Campos principales</th></tr>
+            <tr><td><b>movimiento</b></td><td>Ingreso o gasto — visible para los dos adultos</td><td><code>id</code> · <code>hogar_id</code> · <code>miembro_id</code> (quién pagó o cobró) · <code>tipo</code> enum(ingreso, gasto) · <code>monto</code> decimal(12,2) · <code>categoria_id</code> · <code>fecha</code> · <code>nota</code> · <code>foto_url</code> nulo</td></tr>
+            <tr><td><b>categoria</b></td><td>Clasificar gastos e ingresos</td><td><code>id</code> · <code>hogar_id</code> · <code>nombre</code> · <code>tipo</code> · <code>orden</code></td></tr>
+            <tr><td><b>cargo_fijo</b></td><td>Gastos que se repiten y entran solos</td><td><code>id</code> · <code>hogar_id</code> · <code>titulo</code> · <code>monto_estimado</code> · <code>dia_del_mes</code> · <code>cada_n_meses</code> · <code>miembro_id</code> · <code>categoria_id</code></td></tr>
+            <tr><td><b>articulo_super</b></td><td>Lista del súper</td><td><code>id</code> · <code>hogar_id</code> · <code>nombre</code> · <code>cantidad</code> · <code>pasillo</code> · <code>estado</code> enum(pendiente, comprado) · <code>agregado_por</code> · <code>origen</code> enum(manual, despensa, menu)</td></tr>
+            <tr><td><b>despensa</b></td><td>Lo que hay y lo que se acabó</td><td><code>id</code> · <code>hogar_id</code> · <code>nombre</code> · <code>estado</code> enum(hay, se_acaba, se_acabo) · <code>frecuencia_dias</code> nulo</td></tr>
+            <tr><td><b>receta</b> / <b>receta_ingrediente</b></td><td>El recetario propio que arma el súper</td><td><code>receta</code>: <code>id</code> · <code>titulo</code> · <code>porciones_base</code> · <code>notas</code> — <code>ingrediente</code>: <code>receta_id</code> · <code>nombre</code> · <code>cantidad</code> · <code>unidad</code></td></tr>
+            <tr><td><b>menu_dia</b></td><td>Qué se cocina cada día</td><td><code>id</code> · <code>hogar_id</code> · <code>fecha</code> · <code>receta_id</code> · <code>porciones</code></td></tr>
+            <tr><td><b>antojo</b></td><td>Lugar o plan guardado, y su historial</td><td><code>id</code> · <code>hogar_id</code> · <code>titulo</code> · <code>etiquetas</code> arreglo · <code>guardado_por</code> · <code>estado</code> enum(pendiente, vivido) · <code>vivido_en</code> · <code>estrellas</code> · <code>comentario</code></td></tr>
+            <tr><td><b>fecha_importante</b></td><td>Cumpleaños, aniversarios, pagos</td><td><code>id</code> · <code>hogar_id</code> · <code>titulo</code> · <code>fecha</code> · <code>anual</code> booleano · <code>avisar_dias_antes</code> entero</td></tr>
+            <tr><td><b>acuerdo</b> / <b>firma</b></td><td>Promesas con fecha y firmas</td><td><code>acuerdo</code>: <code>id</code> · <code>texto</code> · <code>vigencia_dias</code> nulo · <code>estado</code> — <code>firma</code>: <code>acuerdo_id</code> · <code>miembro_id</code> · <code>firmado_en</code></td></tr>
+            <tr><td><b>mensaje_del_dia</b></td><td>Los mensajes que se dejan entre ustedes</td><td><code>id</code> · <code>hogar_id</code> · <code>de_miembro_id</code> · <code>para_miembro_id</code> · <code>texto</code> · <code>mostrar_desde</code> · <code>mostrado_en</code> nulo</td></tr>
+            <tr><td><b>gracias</b></td><td>Reconocimiento anclado a algo real</td><td><code>id</code> · <code>de</code> · <code>para</code> · <code>tarea_id</code> nulo · <code>texto</code> · <code>fecha</code></td></tr>
+            <tr><td><b>auditoria</b></td><td>Quién cambió qué (dinero y tareas ajenas)</td><td><code>id</code> · <code>hogar_id</code> · <code>miembro_id</code> · <code>entidad</code> · <code>entidad_id</code> · <code>accion</code> · <code>antes</code> jsonb · <code>despues</code> jsonb · <code>fecha</code></td></tr>
+          </table>
+        </div>
+
+        <div class="callout dec">
+          <span class="lbl">La decisión de modelado que sostiene todo</span>
+          <p><b>Plantilla y ocurrencia son cosas distintas.</b> La plantilla dice "los jueves, barrer, es de ella". La ocurrencia es "jueves 20 de agosto, barrer, hecha a las 7:40". Las ocurrencias se generan al abrir una semana por primera vez y se guardan. Gracias a eso, palomear no altera el machote, el historial nunca se reescribe, y el "solo por esta semana" es una excepción y no un parche. Casi todas las apps de tareas que se sienten rotas fallaron aquí.</p>
+        </div>
+
+        <h3>Notas de base de datos</h3>
+        <ul>
+          <li>Llaves primarias <code>uuid</code> generadas en el teléfono: permite crear sin conexión y sincronizar sin colisiones.</li>
+          <li><code>hogar_id</code> en todas las tablas, con índice, y seguridad a nivel de fila apoyada en él.</li>
+          <li>Índices por <code>(hogar_id, fecha)</code> en tareas y movimientos: son las dos consultas que se hacen todo el tiempo.</li>
+          <li>Las fechas de tareas se guardan como <b>fecha</b>, no como marca de tiempo: un jueves es un jueves aunque el teléfono ande en otra zona horaria.</li>
+          <li>Montos en <code>decimal(12,2)</code>, nunca en coma flotante.</li>
+          <li>Borrado suave (<code>borrado_en</code>) en tareas, movimientos y antojos, para que sincronizar un borrado no destruya datos del otro dispositivo.</li>
+          <li>Como decidiste que el dinero es abierto entre ustedes, el modelo se simplifica: no hay campo de visibilidad ni reglas por movimiento. Un solo permiso: adultos ven todo, niñas no ven nada de dinero.</li>
+        </ul>
+      </section>
+
+      <!-- 10 API -->
+      <section id="api">
+        <div class="sec-title">
+          <span class="n">10</span>
+          <h2>API</h2>
+          <p>Con Supabase, la mayoría de las lecturas y escrituras simples son directas contra la base con seguridad por fila. Lo que sí necesita lógica propia son estos endpoints. Los describo de forma estándar para que sirvan igual si algún día se cambia a un backend propio.</p>
+        </div>
+
+        <div class="tw">
+          <table>
+            <tr><th>Método y ruta</th><th>Propósito</th><th>Request</th><th>Response</th><th>Validaciones y errores</th></tr>
+            <tr>
+              <td><code>POST /hogares</code></td>
+              <td>Crear el hogar y dejar al creador como adulto</td>
+              <td><code>{nombre, zona_horaria}</code></td>
+              <td><code>201 {hogar, miembro}</code></td>
+              <td>Nombre 1–60. <code>401</code> sin sesión · <code>409</code> si el usuario ya tiene hogar</td>
+            </tr>
+            <tr>
+              <td><code>POST /hogares/:id/invitaciones</code></td>
+              <td>Generar código para la pareja</td>
+              <td><code>{}</code></td>
+              <td><code>201 {codigo, expira}</code></td>
+              <td>Solo adultos del hogar. <code>403</code> si no lo es · <code>429</code> si genera más de 5 por hora</td>
+            </tr>
+            <tr>
+              <td><code>POST /invitaciones/:codigo/aceptar</code></td>
+              <td>Unirse al hogar</td>
+              <td><code>{nombre}</code></td>
+              <td><code>200 {hogar, miembro}</code></td>
+              <td><code>404</code> código inexistente · <code>410</code> vencido o usado · <code>409</code> el hogar ya tiene 2 adultos</td>
+            </tr>
+            <tr>
+              <td><code>POST /miembros</code></td>
+              <td>Agregar perfil de niña</td>
+              <td><code>{nombre, rol:"niña", edad, pin?}</code></td>
+              <td><code>201 {miembro}</code></td>
+              <td>Solo adultos. Sin correo para menores. <code>422</code> si el rol no es válido</td>
+            </tr>
+            <tr>
+              <td><code>GET /semanas/:fecha</code></td>
+              <td>Traer la semana ya materializada (crea las ocurrencias si es la primera vez)</td>
+              <td>—</td>
+              <td><code>200 {dias:[{fecha, tareas:[…]}]}</code></td>
+              <td>Fecha ISO. Idempotente: llamarla dos veces no duplica tareas</td>
+            </tr>
+            <tr>
+              <td><code>POST /tareas</code></td>
+              <td>Crear tarea suelta o plantilla, según <code>repite</code></td>
+              <td><code>{id, titulo, miembro_id, fecha|dias[], repite:bool}</code></td>
+              <td><code>201 {tarea|plantilla}</code></td>
+              <td>Título 1–80 · miembro del mismo hogar · <code>422</code> si repite sin días</td>
+            </tr>
+            <tr>
+              <td><code>PATCH /tareas/:id</code></td>
+              <td>Palomear, despalomear, mover o reasignar una ocurrencia</td>
+              <td><code>{estado?, fecha?, miembro_id?, cliente_ts}</code></td>
+              <td><code>200 {tarea}</code></td>
+              <td>Idempotente por <code>cliente_ts</code> · <code>409</code> si llega un cambio más viejo que el guardado</td>
+            </tr>
+            <tr>
+              <td><code>PATCH /plantillas/:id</code></td>
+              <td>Editar el machote de aquí en adelante</td>
+              <td><code>{titulo?, dias?, miembro_id?, desde}</code></td>
+              <td><code>200 {plantilla_nueva}</code></td>
+              <td>Cierra la anterior con <code>hasta</code>; nunca reescribe el pasado</td>
+            </tr>
+            <tr>
+              <td><code>DELETE /tareas/:id?alcance=una|serie</code></td>
+              <td>Borrar solo esta o toda la serie</td>
+              <td>—</td>
+              <td><code>204</code></td>
+              <td><code>alcance</code> obligatorio · <code>400</code> si falta (nunca se asume)</td>
+            </tr>
+            <tr>
+              <td><code>POST /sync</code></td>
+              <td>Subir la cola de cambios hechos sin conexión y bajar los del otro</td>
+              <td><code>{desde_ts, cambios:[…]}</code></td>
+              <td><code>200 {aplicados, conflictos, cambios_servidor}</code></td>
+              <td>Máximo 500 cambios por llamada · rechaza los de otro hogar</td>
+            </tr>
+            <tr>
+              <td><code>POST /movimientos</code></td>
+              <td>Registrar ingreso o gasto (v2)</td>
+              <td><code>{tipo, monto, categoria_id, fecha, visibilidad}</code></td>
+              <td><code>201 {movimiento}</code></td>
+              <td>Monto &gt; 0 y &lt; 1,000,000 · fecha no futura más de 1 día · <code>422</code> categoría de otro hogar</td>
+            </tr>
+            <tr>
+              <td><code>GET /dinero/resumen?mes&amp;ambito=mio|nuestro</code></td>
+              <td>Los dos resúmenes (v2)</td>
+              <td>—</td>
+              <td><code>200 {entro, salio, queda, por_categoria[], por_miembro[]}</code></td>
+              <td>En <code>nuestro</code> devuelve totales; el detalle privado del otro nunca se incluye</td>
+            </tr>
+            <tr>
+              <td><code>POST /push/suscripciones</code></td>
+              <td>Registrar el teléfono para notificaciones</td>
+              <td><code>{endpoint, llaves}</code></td>
+              <td><code>201</code></td>
+              <td>Una por dispositivo; se borra sola si el envío falla dos veces</td>
+            </tr>
+            <tr>
+              <td><code>GET /exportar</code></td>
+              <td>Llevarse todo en JSON</td>
+              <td>—</td>
+              <td><code>200</code> archivo</td>
+              <td>Solo adultos; queda registrado en auditoría</td>
+            </tr>
+          </table>
+        </div>
+        <p>Convenciones para todos: JSON, fechas en ISO, errores con <code>{error:{codigo, mensaje}}</code> y mensaje en español listo para mostrarle al usuario. Todo lo que crea recursos acepta el <code>id</code> generado en el teléfono, para que reintentar nunca duplique.</p>
+      </section>
+
+      <!-- 11 SEGURIDAD -->
+      <section id="seguridad">
+        <div class="sec-title">
+          <span class="n">11</span>
+          <h2>Seguridad y privacidad</h2>
+          <p>Son cuatro personas, pero los datos son de los más sensibles que existen: dinero, rutinas, ubicación implícita y menores de edad.</p>
+        </div>
+
+        <h3>Autenticación y sesiones</h3>
+        <ul>
+          <li>Correo y contraseña, o link mágico. Contraseñas guardadas con hash fuerte por el proveedor de autenticación — <b>nunca escribimos nuestro propio manejo de contraseñas</b>.</li>
+          <li>Token de acceso de vida corta con renovación automática; token de renovación revocable desde Ajustes ("cerrar sesión en todos lados").</li>
+          <li>Los tokens se guardan en el almacenamiento del navegador con la app instalada; con un backend propio se preferiría cookie <code>httpOnly</code> + <code>SameSite=Lax</code>.</li>
+          <li>Las niñas entran desde su propio dispositivo <b>sin cuenta de correo</b>: tú generas un código de un solo uso desde tu app, ella lo captura una vez en su tablet o teléfono, y ese dispositivo queda vinculado a su perfil. Después solo pide un PIN de cuatro dígitos. Puedes revocar un dispositivo desde Ajustes cuando quieras — útil si se pierde o se cambia.</li>
+          <li>La sesión de una niña está limitada por diseño: solo puede leer y palomear sus propias tareas. No es una cuenta con menos permisos, es una vista que no tiene acceso a nada más.</li>
+        </ul>
+
+        <h3>Roles y permisos</h3>
+        <div class="tw">
+          <table>
+            <tr><th>Acción</th><th>Adulto</th><th>Niña</th></tr>
+            <tr><td>Ver y palomear sus propias tareas</td><td>Sí</td><td>Sí</td></tr>
+            <tr><td>Ver tareas de todo el hogar</td><td>Sí</td><td>No</td></tr>
+            <tr><td>Crear, editar y borrar tareas de cualquiera</td><td>Sí</td><td>No</td></tr>
+            <tr><td>Ver el resumen de dinero conjunto</td><td>Sí</td><td>No</td></tr>
+            <tr><td>Ver el detalle de gastos del otro adulto</td><td>Sí — decidieron dinero abierto</td><td>No</td></tr>
+            <tr><td>Invitar, exportar, borrar el hogar</td><td>Sí</td><td>No</td></tr>
+          </table>
+        </div>
+
+        <h3>Protección de la información</h3>
+        <ul>
+          <li><b>Frontera por hogar:</b> cada consulta filtra por <code>hogar_id</code> en la propia base de datos. Aunque alguien manipule la aplicación, no puede leer otro hogar. Esto evita la falla más común en apps pequeñas: pedir el recurso de otro cambiando el número en la dirección.</li>
+          <li><b>Dinero abierto entre los dos adultos, cerrado para todo lo demás:</b> ambos ven cada movimiento, y las niñas no ven nada de dinero. La regla vive en la base de datos, no en la pantalla. Si algún día quieren un movimiento privado, se agrega un campo y se cambia la regla en un solo lugar.</li>
+          <li><b>Datos de menores al mínimo:</b> nombre de pila y edad. Sin apellidos, sin escuela, sin fotos, sin ubicación, y sin ninguna medición de comportamiento.</li>
+          <li><b>Fotos</b> en almacenamiento privado con enlaces firmados que caducan. Nunca públicas.</li>
+          <li><b>Cifrado</b> en tránsito siempre, y en reposo por el proveedor. Respaldo diario automático más exportación manual desde la app.</li>
+        </ul>
+
+        <h3>Validación y protección de la API</h3>
+        <ul>
+          <li>Validación de esquema en el teléfono <em>y</em> en el servidor: lo del teléfono es para ayudar, lo del servidor es lo que protege.</li>
+          <li>Restricciones en la propia base: montos positivos, estados dentro del enumerado, llaves foráneas al mismo hogar.</li>
+          <li>Límite de peticiones en invitaciones, entrada y sincronización.</li>
+          <li>Nada de llaves secretas en el teléfono. Si se agrega IA, se llama desde el servidor con tope de gasto.</li>
+        </ul>
+
+        <h3>Vulnerabilidades típicas y cómo se evitan</h3>
+        <div class="tw">
+          <table>
+            <tr><th>Riesgo</th><th>Cómo se evita aquí</th></tr>
+            <tr><td>Acceder a datos de otro cambiando un identificador</td><td>Seguridad por fila en la base, no en la pantalla</td></tr>
+            <tr><td>Inyección SQL</td><td>Consultas parametrizadas siempre; cero SQL armado con texto</td></tr>
+            <tr><td>Scripts inyectados en un título de tarea</td><td>React escapa por defecto; prohibido insertar HTML crudo</td></tr>
+            <tr><td>Robo de sesión</td><td>Tokens de vida corta, revocables, y HTTPS obligatorio</td></tr>
+            <tr><td>Averiguar qué correos existen</td><td>Mismo mensaje exista o no la cuenta</td></tr>
+            <tr><td>Fugas por enlaces de fotos</td><td>Bucket privado con URL firmada de corta duración</td></tr>
+            <tr><td>Dispositivo de una niña perdido o prestado</td><td>Cada dispositivo se revoca por separado desde Ajustes, sin tocar los demás</td></tr>
+            <tr><td>Datos que quedan tras una ruptura</td><td>Exportar y borrar el hogar completo desde Ajustes, sin pedir permiso al otro</td></tr>
+            <tr><td>Registros con información sensible</td><td>Los logs no guardan montos, textos de mensajes ni nombres de menores</td></tr>
+          </table>
+        </div>
+
+        <h3>Auditoría</h3>
+        <p>Se registra quién cambió qué en dinero y en tareas ajenas, con el antes y el después. No es para vigilarse: es para resolver el "yo no lo borré" sin discutir, y para poder revertir un error. Visible para los adultos en Ajustes.</p>
+      </section>
+
+      <!-- 12 PLAN -->
+      <section id="plan">
+        <div class="sec-title">
+          <span class="n">12</span>
+          <h2>Plan de desarrollo</h2>
+          <p>Once fases con un criterio de terminado cada una. La fase 6 es la más importante y es la que casi todos se saltan.</p>
+        </div>
+
+        <div class="phase"><span class="n">Fase 1</span><div><h4>Base del proyecto</h4><p>Repositorio, React con TypeScript, estructura de módulos, tokens de color y tipografía, tema claro y oscuro, cascarón de PWA instalable, despliegue automático.</p><p class="dod">Listo cuando: se instala en tu teléfono y muestra una pantalla vacía con la navegación real.</p></div></div>
+        <div class="phase"><span class="n">Fase 2</span><div><h4>Cuentas y hogar</h4><p>Registro, entrada, creación del hogar, invitación por código, alta de perfiles de niñas y cambio de perfil.</p><p class="dod">Listo cuando: tu pareja entra desde su teléfono al mismo hogar.</p></div></div>
+        <div class="phase"><span class="n">Fase 3</span><div><h4>Base de datos y permisos</h4><p>Esquema completo del MVP, migraciones versionadas, seguridad por fila, datos de prueba y respaldos automáticos.</p><p class="dod">Listo cuando: una cuenta de otro hogar no puede leer ni un renglón del suyo.</p></div></div>
+        <div class="phase"><span class="n">Fase 4</span><div><h4>Módulo de tareas</h4><p>Plantillas y ocurrencias, vista Hoy, vista Semana, crear con el interruptor de repetir, editar y borrar con la pregunta de alcance, mover y reasignar.</p><p class="dod">Listo cuando: cargas tu machote real y la semana siguiente se genera sola y correcta.</p></div></div>
+        <div class="phase"><span class="n">Fase 5</span><div><h4>Sin conexión, tiempo real y avisos</h4><p>Cola de cambios local, sincronización con resolución de conflictos, actualización en vivo entre teléfonos, recordatorio diario y aviso agrupado.</p><p class="dod">Listo cuando: palomeas en modo avión, abres señal y aparece en el otro teléfono sin duplicados.</p></div></div>
+        <div class="phase"><span class="n">Fase 6</span><div><h4>La app de las niñas</h4><p>Vinculación de dispositivo por código de un solo uso, PIN, vista mínima con sus tareas del día, estrellas, y revocación de dispositivos desde Ajustes.</p><p class="dod">Listo cuando: cada una entra desde su propio aparato, palomea lo suyo, y desde tu teléfono compruebas que no alcanza ninguna otra pantalla.</p></div></div>
+        <div class="phase"><span class="n">Fase 7</span><div><h4>Dinero</h4><p>Movimientos en cuatro toques, categorías propias, cargos fijos automáticos, resumen personal y conjunto —ambos abiertos entre ustedes—, mes semana por semana y exportación.</p><p class="dod">Listo cuando: cierran un mes completo y los números cuadran con la realidad.</p></div></div>
+        <div class="phase"><span class="n">Fase 8</span><div><h4>Piloto real de dos semanas</h4><p>Los cuatro la usan de verdad, sin agregar funciones. Se anota qué se olvidó, qué estorbó y qué nadie abrió. Se corrige eso y solo eso. Es la fase que casi todos se saltan y la que decide si la app se queda.</p><p class="dod">Listo cuando: los dos adultos palomean al menos cuatro días por semana sin que nadie tenga que recordárselo, y el dinero del mes está capturado sin sesiones de ponerse al corriente.</p></div></div>
+        <div class="phase"><span class="n">Fase 9</span><div><h4>Cocina</h4><p>Lista del súper offline, despensa con "se me acabó", recetario propio y menú semanal con porciones.</p><p class="dod">Listo cuando: hacen un súper completo desde la app, con los dos tachando a la vez.</p></div></div>
+        <div class="phase"><span class="n">Fase 10</span><div><h4>Nosotros</h4><p>Detalle del día con mensajes propios, antojos e historial, fechas importantes con aviso anticipado, acuerdos firmados y tarjetas para compartir por WhatsApp.</p><p class="dod">Listo cuando: la app se abre en la mañana por gusto, no por pendiente.</p></div></div>
+        <div class="phase"><span class="n">Fase 11</span><div><h4>Seguridad, auditoría y respaldo</h4><p>Revisión de permisos, registro de auditoría, revocación de dispositivos, exportar y borrar, límites de peticiones, monitoreo de errores y prueba de restauración de respaldo.</p><p class="dod">Listo cuando: se restaura un respaldo completo en limpio y no falta nada.</p></div></div>
+        <div class="phase"><span class="n">Fase 12</span><div><h4>Pruebas y cierre</h4><p>Pruebas automáticas de las reglas críticas (recurrencias, sincronización, permisos y montos), pruebas de extremo a extremo de los flujos B, C, D y G, y revisión de accesibilidad.</p><p class="dod">Listo cuando: se puede cambiar código sin miedo porque las pruebas avisan.</p></div></div>
+
+        <div class="callout ok">
+          <span class="lbl">Cómo sabremos que funcionó</span>
+          <p>No por cuántas funciones tenga, sino por tres señales a los tres meses: los dos siguen palomeando la mayoría de los días, el domingo se cierra la semana casi siempre, y ninguno se ha sentido evaluado por la app. Si eso se cumple, agregamos. Si no, quitamos.</p>
+        </div>
+      </section>
+
+      <div class="final">
+        <h2>Qué falta para empezar</h2>
+        <p>Las cuatro decisiones grandes ya están tomadas y aplicadas en este documento. Lo que sigue no me bloquea para las primeras fases, pero lo necesito antes de la fase 4:</p>
+        <p><b>1. Los nombres reales</b> de los cuatro, y la edad de cada niña.</p>
+        <p><b>2. Tu machote de verdad:</b> qué le toca a cada quien de lunes a domingo. Mándamelo como te salga, aunque sea en desorden.</p>
+        <p><b>3. Tus categorías de dinero</b> y qué gastos fijos hay, con su día del mes.</p>
+        <p><b>4. Qué teléfono usa cada quien</b> (Android o iPhone) y qué dispositivo tiene cada niña.</p>
+        <p style="color:var(--ink);font-weight:600">Cuando estés de acuerdo, escribe <b>APROBADO</b> y empiezo a construir por fases, explicando cada parte.</p>
+      </div>
+
+      <footer>Anteproyecto Juntos+ · agosto 2026 · documento de trabajo, actualizado con tus decisiones</footer>
+    </main>
+  </div>
+</div>
