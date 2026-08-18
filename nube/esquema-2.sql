@@ -1,5 +1,6 @@
--- Juntos+ · tablas de dinero (entrega 2)
--- Se pega igual que el otro: SQL Editor → New query → Run.
+-- Juntos+ · segunda parte del esquema
+-- Tablas de dinero + las funciones para crear la casa y unirse a ella.
+-- Se pega igual que el primero: SQL Editor → New query → Run.
 -- Requiere que ya se haya corrido esquema.sql.
 
 create table if not exists cargo_fijo (
@@ -76,3 +77,80 @@ create policy meta_editar on meta_ingreso for update using (hogar_id = mi_hogar(
 create trigger t_cargo      before update on cargo_fijo   for each row execute function marcar_actualizado();
 create trigger t_movimiento before update on movimiento   for each row execute function marcar_actualizado();
 create trigger t_meta       before update on meta_ingreso for each row execute function marcar_actualizado();
+
+-- ---------------------------------------------- entrar a la casa
+
+-- Código corto de la casa: lo teclea la segunda persona para unirse.
+alter table hogar add column if not exists codigo text unique;
+
+-- Crear la casa con sus miembros. Va como función porque la seguridad por
+-- fila, con razón, no deja crear un hogar al que todavía no perteneces.
+create or replace function crear_hogar(p_nombre text, p_codigo text, p_miembros jsonb, p_yo text)
+returns jsonb language plpgsql security definer set search_path = public as $$
+declare
+  v_hogar uuid;
+  m jsonb;
+  v_id uuid;
+  v_yo uuid;
+begin
+  if auth.uid() is null then raise exception 'Hay que entrar primero.'; end if;
+  if exists (select 1 from miembro where usuario_id = auth.uid()) then
+    raise exception 'Esta cuenta ya pertenece a una casa.';
+  end if;
+
+  insert into hogar (nombre, codigo)
+  values (coalesce(nullif(p_nombre, ''), 'Nuestra casa'), upper(p_codigo))
+  returning id into v_hogar;
+
+  for m in select * from jsonb_array_elements(p_miembros) loop
+    insert into miembro (hogar_id, nombre, corto, rol, color)
+    values (v_hogar, m->>'nombre', m->>'corto',
+            coalesce((m->>'rol')::rol_miembro, 'adulto'), coalesce(m->>'color', 'fa'))
+    returning id into v_id;
+
+    if (m->>'corto') = p_yo then
+      v_yo := v_id;
+      update miembro set usuario_id = auth.uid() where id = v_id;
+    end if;
+  end loop;
+
+  if v_yo is null then raise exception 'No encontré a quién eres dentro de la lista.'; end if;
+  return jsonb_build_object('hogar_id', v_hogar, 'miembro_id', v_yo, 'codigo', upper(p_codigo));
+end $$;
+
+-- Ver quiénes viven en esa casa y cuáles ya tienen dueño, para poder elegir.
+create or replace function miembros_por_codigo(p_codigo text)
+returns table (corto text, nombre text, rol rol_miembro, tomado boolean)
+language sql security definer set search_path = public as $$
+  select m.corto, m.nombre, m.rol, m.usuario_id is not null
+  from miembro m join hogar h on h.id = m.hogar_id
+  where h.codigo = upper(p_codigo) and m.activo
+  order by m.creado_en
+$$;
+
+-- Unirse a una casa que ya existe, tomando el lugar que nadie ha reclamado.
+create or replace function unirse_a_hogar(p_codigo text, p_corto text)
+returns jsonb language plpgsql security definer set search_path = public as $$
+declare
+  v_hogar uuid;
+  v_id uuid;
+begin
+  if auth.uid() is null then raise exception 'Hay que entrar primero.'; end if;
+  if exists (select 1 from miembro where usuario_id = auth.uid()) then
+    raise exception 'Esta cuenta ya pertenece a una casa.';
+  end if;
+
+  select id into v_hogar from hogar where codigo = upper(p_codigo);
+  if v_hogar is null then raise exception 'Ese código no existe. Revísalo con quien creó la casa.'; end if;
+
+  select id into v_id from miembro
+  where hogar_id = v_hogar and corto = p_corto and usuario_id is null and activo;
+  if v_id is null then raise exception 'Ese lugar ya lo tomó alguien más.'; end if;
+
+  update miembro set usuario_id = auth.uid() where id = v_id;
+  return jsonb_build_object('hogar_id', v_hogar, 'miembro_id', v_id);
+end $$;
+
+grant execute on function crear_hogar(text, text, jsonb, text) to authenticated;
+grant execute on function miembros_por_codigo(text) to authenticated;
+grant execute on function unirse_a_hogar(text, text) to authenticated;
