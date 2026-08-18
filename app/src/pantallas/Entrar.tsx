@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { crearCasa, entrar, miembrosDeLaCasa, unirseACasa } from '../nube/sesion'
-import { arrancarNube, subirLoDeAqui, useNube } from '../nube/sincronizacion'
+import { arrancarNube, bajar, subirLoDeAqui, useNube } from '../nube/sincronizacion'
 import { MIEMBROS } from '../seed'
 import { Avatar } from '../componentes'
 import type { MiembroId } from '../types'
@@ -85,8 +85,10 @@ function ElegirCasa({ onListo }: { onListo: () => void }) {
     setError(''); setCargando(true)
     try {
       await crearCasa('Nuestra casa', yo)
-      await arrancarNube()
+      // Primero se sube lo de este teléfono; bajar antes dejaría la casa vacía.
+      await arrancarNube(false)
       await subirLoDeAqui()
+      await bajar()
       onListo()
     } catch (e) {
       setError(e instanceof Error ? e.message : 'No pude crear la casa.')

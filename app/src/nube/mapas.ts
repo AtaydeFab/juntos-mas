@@ -1,5 +1,5 @@
 import type {
-  CargoFijo, Evento, MiembroId, Movimiento, Plantilla, Recordatorio, Responsable, Tarea, Dia,
+  CargoFijo, Evento, MetaIngreso, MiembroId, Movimiento, Plantilla, Recordatorio, Responsable, Tarea, Dia,
 } from '../types'
 
 /** Traduce entre los identificadores cortos de la app (fa, sa…) y los de la base. */
@@ -28,7 +28,7 @@ const respALocal = (r: string, m: MapaMiembros): Responsable =>
 /** Las filas de la base, tal como viajan por la red. */
 export type Fila = Record<string, unknown>
 
-export const TABLAS = ['plantilla', 'tarea', 'evento', 'recordatorio', 'cargo_fijo', 'movimiento'] as const
+export const TABLAS = ['plantilla', 'tarea', 'evento', 'recordatorio', 'cargo_fijo', 'movimiento', 'meta_ingreso'] as const
 export type Tabla = (typeof TABLAS)[number]
 
 // ------------------------------------------------------------ hacia la base
@@ -129,6 +129,16 @@ export function movimientoAFila(v: Movimiento, hogar: string, m: MapaMiembros): 
   }
 }
 
+export function metaAFila(m: MetaIngreso, hogar: string, mapa: MapaMiembros): Fila {
+  return {
+    id: m.id,
+    hogar_id: hogar,
+    miembro_id: mapa.aUuid[m.miembro] ?? m.miembro,
+    monto: m.monto,
+    periodo: m.periodo,
+  }
+}
+
 // ------------------------------------------------------------ desde la base
 
 export function filaAPlantilla(f: Fila, m: MapaMiembros): Plantilla {
@@ -214,5 +224,14 @@ export function filaAMovimiento(f: Fila, m: MapaMiembros): Movimiento {
     nota: (f.nota as string) ?? undefined,
     cargoId: (f.cargo_id as string) ?? undefined,
     periodo: (f.periodo as string) ?? undefined,
+  }
+}
+
+export function filaAMeta(f: Fila, m: MapaMiembros): MetaIngreso {
+  return {
+    id: f.id as string,
+    miembro: m.aLocal[f.miembro_id as string] ?? 'sa',
+    monto: Number(f.monto),
+    periodo: (f.periodo as MetaIngreso['periodo']) ?? 'semanal',
   }
 }

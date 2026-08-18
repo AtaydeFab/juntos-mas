@@ -80,7 +80,7 @@ export const CARGOS_FIJOS: CargoFijo[] = [
 
 /** El ingreso de Saira es variable: la meta es referencia, nunca un dato dado por hecho. */
 export const METAS: MetaIngreso[] = [
-  { miembro: 'sa', monto: 4500, periodo: 'semanal' },
+  { id: 'm1', miembro: 'sa', monto: 4500, periodo: 'semanal' },
 ]
 
 export const pesos = (n: number) =>

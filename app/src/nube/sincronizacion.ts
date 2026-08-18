@@ -4,8 +4,8 @@ import { miPerfil, type Perfil } from './sesion'
 import { aplicarDeLaNube, cambiarYo, estadoActual, fijarNube, observarCambios, volverIdsUuid } from '../store'
 import type { Estado } from '../types'
 import {
-  cargoAFila, eventoAFila, filaACargo, filaAEvento, filaAMovimiento, filaAPlantilla,
-  filaARecordatorio, filaATarea, movimientoAFila, plantillaAFila, recordatorioAFila, tareaAFila,
+  cargoAFila, eventoAFila, filaACargo, filaAEvento, filaAMeta, filaAMovimiento, filaAPlantilla,
+  filaARecordatorio, filaATarea, metaAFila, movimientoAFila, plantillaAFila, recordatorioAFila, tareaAFila,
   type Fila, type Tabla,
 } from './mapas'
 
@@ -82,7 +82,10 @@ export function useNube(): VistaNube {
 
 // --------------------------------------------------------------- diferencias
 
-type Coleccion = 'plantillas' | 'tareas' | 'eventos' | 'recordatorios' | 'cargosFijos' | 'movimientos'
+type Coleccion = 'plantillas' | 'tareas' | 'eventos' | 'recordatorios' | 'cargosFijos' | 'movimientos' | 'metas'
+
+/** Estas dos no tienen marca de borrado: una se desactiva, la otra se quita de veras. */
+const SIN_MARCA_DE_BORRADO = new Set<Tabla>(['plantilla', 'meta_ingreso'])
 
 const TABLA_DE: Record<Coleccion, Tabla> = {
   plantillas: 'plantilla',
@@ -91,6 +94,7 @@ const TABLA_DE: Record<Coleccion, Tabla> = {
   recordatorios: 'recordatorio',
   cargosFijos: 'cargo_fijo',
   movimientos: 'movimiento',
+  metas: 'meta_ingreso',
 }
 
 function aFila(coleccion: Coleccion, dato: unknown, p: Perfil, yo: Estado['yo']): Fila {
@@ -101,6 +105,7 @@ function aFila(coleccion: Coleccion, dato: unknown, p: Perfil, yo: Estado['yo'])
     case 'recordatorios': return recordatorioAFila(dato as never, p.hogarId, p.mapa, yo)
     case 'cargosFijos': return cargoAFila(dato as never, p.hogarId, p.mapa)
     case 'movimientos': return movimientoAFila(dato as never, p.hogarId, p.mapa)
+    case 'metas': return metaAFila(dato as never, p.hogarId, p.mapa)
   }
 }
 
@@ -157,14 +162,16 @@ export async function vaciarCola(): Promise<void> {
     while (cola.length) {
       const op = cola[0]
       const { error } = op.borrar
-        ? await nube.from(op.tabla).update({ borrado_en: op.fila.borrado_en }).eq('id', op.fila.id as string)
+        ? SIN_MARCA_DE_BORRADO.has(op.tabla)
+          ? await nube.from(op.tabla).delete().eq('id', op.fila.id as string)
+          : await nube.from(op.tabla).update({ borrado_en: op.fila.borrado_en }).eq('id', op.fila.id as string)
         : await nube.from(op.tabla).upsert(op.fila)
 
       if (error) {
         // Permiso denegado o duplicado: esa fila no va a entrar nunca, se descarta
         // para que no atore a las demás. Lo de red sí se reintenta después.
         const codigo = (error as { code?: string }).code ?? ''
-        if (codigo === '42501' || codigo === '23505' || codigo === '23503' || codigo === '22P02') {
+        if (['42501', '23505', '23503', '22P02', '42703'].includes(codigo)) {
           cola = cola.slice(1)
           guardarCola()
           continue
@@ -190,12 +197,11 @@ export async function bajar(): Promise<void> {
   const p = perfil
   const conexionNube = nube
 
-  const tablas: Tabla[] = ['plantilla', 'tarea', 'evento', 'recordatorio', 'cargo_fijo', 'movimiento']
+  const tablas: Tabla[] = ['plantilla', 'tarea', 'evento', 'recordatorio', 'cargo_fijo', 'movimiento', 'meta_ingreso']
   const resultados = await Promise.all(
     tablas.map(t => {
       const consulta = conexionNube.from(t).select('*').eq('hogar_id', p.hogarId)
-      // El machote no se borra, se desactiva; las demás sí llevan marca de borrado.
-      return t === 'plantilla' ? consulta : consulta.is('borrado_en', null)
+      return SIN_MARCA_DE_BORRADO.has(t) ? consulta : consulta.is('borrado_en', null)
     }),
   )
 
@@ -205,7 +211,8 @@ export async function bajar(): Promise<void> {
     return
   }
 
-  const [plantillas, tareas, eventos, recordatorios, cargos, movimientos] = resultados.map(r => (r.data ?? []) as Fila[])
+  const [plantillas, tareas, eventos, recordatorios, cargos, movimientos, metas] =
+    resultados.map(r => (r.data ?? []) as Fila[])
 
   aplicarDeLaNube({
     plantillas: plantillas.map(f => filaAPlantilla(f, p.mapa)),
@@ -214,6 +221,7 @@ export async function bajar(): Promise<void> {
     recordatorios: recordatorios.map(f => filaARecordatorio(f, p.mapa)),
     cargosFijos: cargos.map(f => filaACargo(f, p.mapa)),
     movimientos: movimientos.map(f => filaAMovimiento(f, p.mapa)),
+    metas: metas.map(f => filaAMeta(f, p.mapa)),
   })
   fijar('listo')
 }
@@ -253,13 +261,17 @@ export async function subirLoDeAqui(): Promise<void> {
   volverIdsUuid()
   const vacio: Estado = {
     ...estadoActual(),
-    plantillas: [], tareas: [], eventos: [], recordatorios: [], cargosFijos: [], movimientos: [],
+    plantillas: [], tareas: [], eventos: [], recordatorios: [], cargosFijos: [], movimientos: [], metas: [],
   }
   encolar(diferencias(vacio, estadoActual(), perfil))
   await vaciarCola()
 }
 
-export async function arrancarNube(): Promise<Conexion> {
+/**
+ * Conecta con la nube. Al crear la casa se pasa `bajarPrimero = false`: la casa
+ * acaba de nacer vacía y bajarla borraría lo que este teléfono todavía no sube.
+ */
+export async function arrancarNube(bajarPrimero = true): Promise<Conexion> {
   if (!hayNube || !nube) { fijar('sin-nube'); return conexion }
 
   const { data } = await nube.auth.getSession()
@@ -291,7 +303,8 @@ export async function arrancarNube(): Promise<Conexion> {
   cola = cola.filter(o => esUuid(String(o.fila.id ?? '')))
   guardarCola()
 
-  await bajar()
+  if (bajarPrimero) await bajar()
+  else fijar('listo')
   await vaciarCola()
   escuchar()
   return conexion

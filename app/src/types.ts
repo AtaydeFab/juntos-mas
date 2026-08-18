@@ -111,6 +111,7 @@ export interface Movimiento {
 }
 
 export interface MetaIngreso {
+  id: string
   miembro: MiembroId
   monto: number
   periodo: 'semanal'

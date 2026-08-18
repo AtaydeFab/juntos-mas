@@ -1,9 +1,9 @@
 import { useMemo, useState } from 'react'
-import { useEstado, confirmarCargo, borrarMovimiento } from '../store'
+import { useEstado, confirmarCargo, borrarMovimiento, fijarMeta, quitarMeta } from '../store'
 import { miembro, pesos } from '../seed'
 import { avanceDeLaSemana, pendientesDelMes, resumenDelMes, type Ocurrencia } from '../dinero'
 import { desdeYmd, fechaCorta, hoy, nombreMes } from '../dates'
-import type { Movimiento } from '../types'
+import type { MiembroId, Movimiento } from '../types'
 
 type Ambito = 'mio' | 'nuestro'
 
@@ -27,8 +27,9 @@ export default function Dinero({ onCapturar }: { onCapturar: (o?: Ocurrencia) =>
     ? pendientes.filter(o => o.cargo.quien === estado.yo || o.cargo.aportaciones?.some(a => a.miembro === estado.yo))
     : pendientes
 
-  const miMeta = estado.metas.find(m => m.miembro === (mios ? estado.yo : 'sa'))
-  const avance = miMeta ? avanceDeLaSemana(estado.movimientos, miMeta.miembro) : 0
+  const deQuien = mios ? estado.yo : 'sa'
+  const miMeta = estado.metas.find(m => m.miembro === deQuien)
+  const avance = avanceDeLaSemana(estado.movimientos, deQuien)
 
   const ultimos = useMemo(() => {
     return estado.movimientos
@@ -88,20 +89,7 @@ export default function Dinero({ onCapturar }: { onCapturar: (o?: Ocurrencia) =>
         </>
       )}
 
-      {miMeta && (
-        <div className="panel">
-          <span className="k">Meta de la semana · {miembro(miMeta.miembro)?.nombre}</span>
-          <div className="track" style={{ height: 12 }}>
-            <span className="fill sa" style={{ width: `${Math.min(100, (avance / miMeta.monto) * 100)}%` }} />
-          </div>
-          <p style={{ margin: 0, fontSize: 14 }}>
-            <b>{pesos(avance)}</b> de {pesos(miMeta.monto)}
-          </p>
-          <p className="nota">
-            Es una meta, no un dato dado por hecho: la app solo cuenta lo que de verdad entró.
-          </p>
-        </div>
-      )}
+      <Meta miembro={deQuien} monto={miMeta?.monto} avance={avance} />
 
       {resumen.porCategoria.length > 0 && (
         <div className="panel">
@@ -194,6 +182,61 @@ function FilaMovimiento({ m }: { m: Movimiento }) {
             onClick={() => setConfirmando(true)} style={{ color: 'var(--muted)', width: 28, height: 28 }}>×</button>
         )}
       </span>
+    </div>
+  )
+}
+
+/** La meta semanal: se puede cambiar y viaja a los dos teléfonos. */
+function Meta({ miembro: quien, monto, avance }: { miembro: MiembroId; monto?: number; avance: number }) {
+  const [editando, setEditando] = useState(false)
+  const [texto, setTexto] = useState(monto ? String(monto) : '')
+
+  const guardar = () => {
+    const valor = Number(texto.replace(/[^0-9.]/g, ''))
+    if (valor > 0) fijarMeta(quien, valor)
+    else quitarMeta(quien)
+    setEditando(false)
+  }
+
+  if (editando) {
+    return (
+      <div className="panel">
+        <span className="k">Meta de la semana · {miembro(quien)?.nombre}</span>
+        <input className="campo monto-campo" autoFocus inputMode="decimal" value={texto}
+          onChange={e => setTexto(e.target.value)} placeholder="$0" aria-label="Monto de la meta" />
+        <p className="nota">Déjalo en cero si prefieres no tener meta.</p>
+        <button className="btn" type="button" onClick={guardar}>Guardar</button>
+        <button className="btn fantasma" type="button" onClick={() => setEditando(false)}>Cancelar</button>
+      </div>
+    )
+  }
+
+  if (!monto) {
+    return (
+      <div className="panel">
+        <span className="k">Meta de la semana · {miembro(quien)?.nombre}</span>
+        <p className="nota">Sin meta puesta. Sirve de referencia cuando el ingreso es variable.</p>
+        <button className="btn fantasma" type="button" onClick={() => { setTexto(''); setEditando(true) }}>
+          Poner una meta
+        </button>
+      </div>
+    )
+  }
+
+  return (
+    <div className="panel">
+      <span className="k">Meta de la semana · {miembro(quien)?.nombre}</span>
+      <div className="track" style={{ height: 12 }}>
+        <span className={`fill ${quien}`} style={{ width: `${Math.min(100, (avance / monto) * 100)}%` }} />
+      </div>
+      <p style={{ margin: 0, fontSize: 14 }}><b>{pesos(avance)}</b> de {pesos(monto)}</p>
+      <p className="nota">
+        Es una meta, no un dato dado por hecho: la app solo cuenta lo que de verdad entró.
+      </p>
+      <button className="btn fantasma" type="button"
+        onClick={() => { setTexto(String(monto)); setEditando(true) }}>
+        Cambiar la meta
+      </button>
     </div>
   )
 }

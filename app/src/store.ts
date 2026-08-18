@@ -115,6 +115,7 @@ export function volverIdsUuid() {
       id: traducir(v.id),
       cargoId: v.cargoId ? traducir(v.cargoId) : undefined,
     })),
+    metas: estado.metas.map(m => ({ ...m, id: traducir(m.id) })),
   }, true)
 }
 
@@ -288,6 +289,21 @@ export function confirmarCargo(cargoId: string, periodo: string, fecha: string, 
 
 export function borrarMovimiento(movimientoId: string) {
   guardar({ ...estado, movimientos: estado.movimientos.filter(m => m.id !== movimientoId) })
+}
+
+/** Cambia la meta de ingreso de alguien, o la crea si no tenía. */
+export function fijarMeta(miembro: MiembroId, monto: number) {
+  const existe = estado.metas.some(m => m.miembro === miembro)
+  guardar({
+    ...estado,
+    metas: existe
+      ? estado.metas.map(m => (m.miembro === miembro ? { ...m, monto } : m))
+      : [...estado.metas, { id: id(), miembro, monto, periodo: 'semanal' }],
+  })
+}
+
+export function quitarMeta(miembro: MiembroId) {
+  guardar({ ...estado, metas: estado.metas.filter(m => m.miembro !== miembro) })
 }
 
 export function cambiarVista(vista: Vista) {

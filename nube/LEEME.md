@@ -13,7 +13,9 @@ variables, además sincroniza entre los teléfonos de la casa.
 
 ## 2. Cargar el esquema
 
-SQL Editor → New query → pegar todo `esquema.sql` → Run.
+SQL Editor → New query → pegar todo `esquema.sql` → Run. Luego lo mismo con
+`esquema-2.sql` (dinero y entrar a la casa) y con `esquema-3.sql` (poder quitar
+una meta), en ese orden.
 
 ## 3. Conectar la app
 

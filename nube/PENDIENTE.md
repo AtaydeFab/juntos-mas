@@ -35,8 +35,15 @@ Probada de punta a punta contra la base real el 18 de agosto de 2026.
   pide UUID: se renombran respetando las referencias, y lo que igual no entre se
   descarta en vez de atorar la cola.
 
-## Lo único que falta
+## Las metas de ingreso
 
-Las metas de ingreso todavía no viajan a la nube: viven igual en los dos
-teléfonos porque vienen de fábrica. Cuando haya pantalla para cambiarlas, se
-agregan a la sincronización.
+Ya se cambian desde *Dinero* y viajan como todo lo demás. Como una meta se
+quita de veras (no se marca como borrada), la base necesita el permiso de
+`esquema-3.sql`. Sin ese pedazo se pueden poner y cambiar, pero al quitarlas
+regresarían solas.
+
+## La app se actualiza sola
+
+El *service worker* trae la página de la red cuando hay señal y solo usa lo
+guardado si no la hay. Así, cuando se publica una versión nueva, llega al
+teléfono al abrir la app; antes se quedaba pegada la primera que se instaló.
