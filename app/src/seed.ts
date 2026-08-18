@@ -1,4 +1,4 @@
-import type { Miembro, Plantilla, Recordatorio } from './types'
+import type { CargoFijo, MetaIngreso, Miembro, Plantilla, Recordatorio } from './types'
 
 export const MIEMBROS: Miembro[] = [
   { id: 'fa', nombre: 'Fabián', corto: 'Fa', rol: 'adulto', color: 'fa' },
@@ -34,3 +34,54 @@ export const RECORDATORIOS: Recordatorio[] = [
   { id: 'r3', texto: 'No dejar la ropa sucia en el baño', para: 'sa', permanente: true },
   { id: 'r4', texto: 'No dejar los zapatos regados', para: 'sa', permanente: true },
 ]
+
+// ------------------------------------------------------------------ dinero
+
+export const CATEGORIAS_GASTO = [
+  'Renta', 'Ahorro', 'Pensión', 'Servicios', 'Súper',
+  'Comidas fuera', 'Entretenimiento', 'Perro', 'Niñas', 'Otros',
+]
+
+export const CATEGORIAS_INGRESO = ['Sueldo', 'Tarot', 'Otros ingresos']
+
+/** Lo fijo de la casa, tal como lo pasó Fabián. Entra solo y solo se confirma. */
+export const CARGOS_FIJOS: CargoFijo[] = [
+  {
+    id: 'c1', titulo: 'Sueldo de Fabián', tipo: 'ingreso', categoria: 'Sueldo',
+    monto: 12300, cada: 'quincena', quien: 'fa', activo: true,
+  },
+  {
+    id: 'c2', titulo: 'Ahorro', tipo: 'gasto', categoria: 'Ahorro',
+    monto: 4000, cada: 'quincena', quien: 'fa', activo: true,
+    aportaciones: [{ miembro: 'fa', monto: 2000 }, { miembro: 'sa', monto: 2000 }],
+  },
+  {
+    id: 'c3', titulo: 'Pensión de las niñas', tipo: 'gasto', categoria: 'Pensión',
+    monto: 3000, cada: 'quincena', quien: 'fa', activo: true,
+  },
+  {
+    id: 'c4', titulo: 'Renta', tipo: 'gasto', categoria: 'Renta',
+    monto: 4500, cada: 'mes', diaDelMes: 6, quien: 'fa', activo: true,
+    aportaciones: [{ miembro: 'fa', monto: 2500 }, { miembro: 'sa', monto: 2000 }],
+  },
+  {
+    id: 'c5', titulo: 'Internet', tipo: 'gasto', categoria: 'Servicios',
+    monto: 450, cada: 'mes', diaDelMes: 10, quien: 'sa', activo: true, variable: true,
+  },
+  {
+    id: 'c6', titulo: 'Luz', tipo: 'gasto', categoria: 'Servicios',
+    monto: 600, cada: 'dos-meses', anclaMes: 7, quien: 'fa', activo: true, variable: true,
+  },
+  {
+    id: 'c7', titulo: 'Súper de la semana', tipo: 'gasto', categoria: 'Súper',
+    monto: 1000, cada: 'semana', quien: 'fa', activo: true, variable: true,
+  },
+]
+
+/** El ingreso de Saira es variable: la meta es referencia, nunca un dato dado por hecho. */
+export const METAS: MetaIngreso[] = [
+  { miembro: 'sa', monto: 4500, periodo: 'semanal' },
+]
+
+export const pesos = (n: number) =>
+  new Intl.NumberFormat('es-MX', { style: 'currency', currency: 'MXN', maximumFractionDigits: 0 }).format(n)

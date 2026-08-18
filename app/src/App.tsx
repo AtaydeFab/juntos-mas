@@ -3,11 +3,14 @@ import './app.css'
 import Hoy from './pantallas/Hoy'
 import Semana from './pantallas/Semana'
 import Calendario from './pantallas/Calendario'
+import Dinero from './pantallas/Dinero'
 import Mas from './pantallas/Mas'
 import { Hoja, Interruptor, SelectorMiembro } from './componentes'
-import { agregarEvento, agregarTarea, materializarSemana, useEstado } from './store'
+import { agregarEvento, agregarMovimiento, agregarTarea, confirmarCargo, materializarSemana, useEstado } from './store'
+import { CATEGORIAS_GASTO, CATEGORIAS_INGRESO, pesos } from './seed'
+import type { Ocurrencia } from './dinero'
 import { diaCorto, hoy, lunesDe, sumarDias, ymd } from './dates'
-import type { MiembroId, Responsable } from './types'
+import type { MiembroId, Responsable, TipoMovimiento } from './types'
 import { MIEMBROS } from './seed'
 
 type Pestana = 'hoy' | 'semana' | 'calendario' | 'dinero' | 'mas'
@@ -27,7 +30,13 @@ const NOMBRES: Record<Pestana, string> = {
 export default function App() {
   const estado = useEstado()
   const [pestana, setPestana] = useState<Pestana>('hoy')
-  const [hojaAbierta, setHojaAbierta] = useState<'tarea' | 'evento' | null>(null)
+  const [hojaAbierta, setHojaAbierta] = useState<'tarea' | 'evento' | 'movimiento' | null>(null)
+  const [cargoPorCapturar, setCargoPorCapturar] = useState<Ocurrencia | null>(null)
+
+  const capturarCargo = (o?: Ocurrencia) => {
+    setCargoPorCapturar(o ?? null)
+    setHojaAbierta('movimiento')
+  }
 
   useEffect(() => { materializarSemana(lunesDe(hoy())) }, [])
 
@@ -36,17 +45,27 @@ export default function App() {
       {pestana === 'hoy' && <Hoy />}
       {pestana === 'semana' && <Semana />}
       {pestana === 'calendario' && <Calendario />}
-      {pestana === 'dinero' && <Dinero />}
+      {pestana === 'dinero' && <Dinero onCapturar={capturarCargo} />}
       {pestana === 'mas' && <Mas />}
 
-      {(pestana === 'hoy' || pestana === 'semana' || pestana === 'calendario') && (
+      {pestana !== 'mas' && (
         <button className="fab" type="button"
-          aria-label={pestana === 'calendario' ? 'Agendar algo' : 'Agregar tarea o pendiente'}
-          onClick={() => setHojaAbierta(pestana === 'calendario' ? 'evento' : 'tarea')}>＋</button>
+          aria-label={
+            pestana === 'calendario' ? 'Agendar algo'
+              : pestana === 'dinero' ? 'Registrar movimiento'
+                : 'Agregar tarea o pendiente'
+          }
+          onClick={() => setHojaAbierta(
+            pestana === 'calendario' ? 'evento' : pestana === 'dinero' ? 'movimiento' : 'tarea',
+          )}>＋</button>
       )}
 
       {hojaAbierta === 'tarea' && <HojaTarea yo={estado.yo} onCerrar={() => setHojaAbierta(null)} />}
       {hojaAbierta === 'evento' && <HojaEvento onCerrar={() => setHojaAbierta(null)} />}
+      {hojaAbierta === 'movimiento' && (
+        <HojaMovimiento yo={estado.yo} cargo={cargoPorCapturar}
+          onCerrar={() => { setHojaAbierta(null); setCargoPorCapturar(null) }} />
+      )}
 
       <nav className="nav">
         {(Object.keys(NOMBRES) as Pestana[]).map(p => (
@@ -60,24 +79,6 @@ export default function App() {
         ))}
       </nav>
     </div>
-  )
-}
-
-function Dinero() {
-  return (
-    <>
-      <header className="cab"><h1>Dinero</h1><span className="sub">próxima entrega</span></header>
-      <div className="panel">
-        <span className="k">En construcción</span>
-        <p className="nota" style={{ fontSize: 14 }}>
-          Aquí van los ingresos de los dos, los fijos que entran solos —renta el 6, internet, luz,
-          pensión y el ahorro de cada quincena— y el resumen del mes: cuánto entró, cuánto salió y
-          cuánto queda, con la meta semanal de Saira como referencia.
-        </p>
-        <div className="regla" />
-        <p className="nota">Primero quiero que las tareas y el calendario se usen bien unos días. Si algo estorba ahí, es más fácil arreglarlo antes de meter el dinero encima.</p>
-      </div>
-    </>
   )
 }
 
@@ -204,6 +205,84 @@ function HojaEvento({ onCerrar }: { onCerrar: () => void }) {
 
       <div style={{ marginTop: 18 }}>
         <button className="btn" type="button" onClick={guardar} disabled={!titulo.trim()}>Agendar</button>
+      </div>
+    </Hoja>
+  )
+}
+
+function HojaMovimiento({ yo, cargo, onCerrar }: { yo: MiembroId; cargo: Ocurrencia | null; onCerrar: () => void }) {
+  const [tipo, setTipo] = useState<TipoMovimiento>(cargo?.cargo.tipo ?? 'gasto')
+  const [monto, setMonto] = useState('')
+  const [categoria, setCategoria] = useState(cargo?.cargo.categoria ?? 'Súper')
+  const [quien, setQuien] = useState<MiembroId>(cargo?.cargo.quien ?? yo)
+  const [fecha, setFecha] = useState(cargo?.fecha ?? ymd(hoy()))
+  const [nota, setNota] = useState(cargo?.cargo.titulo ?? '')
+
+  const cantidad = Number(monto.replace(/[^0-9.]/g, ''))
+  const valido = cantidad > 0 && cantidad < 1000000
+
+  const guardar = () => {
+    if (!valido) return
+    if (cargo) {
+      confirmarCargo(cargo.cargo.id, cargo.periodo, fecha, cantidad)
+    } else {
+      agregarMovimiento({ tipo, monto: cantidad, categoria, fecha, miembro: quien, nota: nota.trim() || undefined })
+    }
+    onCerrar()
+  }
+
+  const categorias = tipo === 'ingreso' ? CATEGORIAS_INGRESO : CATEGORIAS_GASTO
+
+  return (
+    <Hoja titulo={cargo ? cargo.cargo.titulo : 'Registrar movimiento'} onCerrar={onCerrar}>
+      {!cargo && (
+        <div className="chips" style={{ marginBottom: 14 }}>
+          <button type="button" className={`chip ${tipo === 'gasto' ? 'on' : ''}`}
+            onClick={() => { setTipo('gasto'); setCategoria('Súper') }}>Gasté</button>
+          <button type="button" className={`chip ${tipo === 'ingreso' ? 'on' : ''}`}
+            onClick={() => { setTipo('ingreso'); setCategoria('Tarot') }}>Me pagaron</button>
+        </div>
+      )}
+
+      <input className="campo monto-campo" autoFocus inputMode="decimal" value={monto}
+        onChange={e => setMonto(e.target.value)} placeholder="$0" aria-label="Monto" />
+      {cargo && !cargo.cargo.variable && <p className="nota">Normalmente son {pesos(cargo.cargo.monto)}.</p>}
+      {cargo?.cargo.aportaciones && (
+        <p className="nota">Se reparte igual que siempre: {cargo.cargo.aportaciones
+          .map(a => `${MIEMBROS.find(m => m.id === a.miembro)?.nombre} ${pesos(a.monto)}`).join(' y ')}.</p>
+      )}
+
+      {!cargo && (
+        <>
+          <span className="etiqueta-campo">¿De qué fue?</span>
+          <div className="chips">
+            {categorias.map(c => (
+              <button key={c} type="button" className={`chip ${categoria === c ? 'on' : ''}`}
+                onClick={() => setCategoria(c)}>{c}</button>
+            ))}
+          </div>
+
+          <span className="etiqueta-campo">¿Quién {tipo === 'ingreso' ? 'lo recibió' : 'pagó'}?</span>
+          <div className="chips">
+            {MIEMBROS.filter(m => m.rol === 'adulto').map(m => (
+              <button key={m.id} type="button" className={`chip ${quien === m.id ? 'on' : ''}`}
+                onClick={() => setQuien(m.id)}>{m.nombre}</button>
+            ))}
+          </div>
+
+          <span className="etiqueta-campo">Nota (opcional)</span>
+          <input className="campo" value={nota} onChange={e => setNota(e.target.value)}
+            placeholder="Súper de la semana, gasolina…" />
+        </>
+      )}
+
+      <span className="etiqueta-campo">¿Cuándo?</span>
+      <input className="campo" type="date" value={fecha} onChange={e => setFecha(e.target.value)} />
+
+      <div style={{ marginTop: 18 }}>
+        <button className="btn" type="button" onClick={guardar} disabled={!valido}>
+          {cargo ? 'Confirmar' : tipo === 'ingreso' ? 'Registrar ingreso' : 'Registrar gasto'}
+        </button>
       </div>
     </Hoja>
   )

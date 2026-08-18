@@ -68,6 +68,54 @@ export interface Recordatorio {
   hasta?: string
 }
 
+// ------------------------------------------------------------------ dinero
+
+export type TipoMovimiento = 'ingreso' | 'gasto'
+
+/** Cada cuánto vuelve un cargo fijo. */
+export type Periodicidad = 'quincena' | 'mes' | 'semana' | 'dos-meses'
+
+export interface CargoFijo {
+  id: string
+  titulo: string
+  tipo: TipoMovimiento
+  categoria: string
+  monto: number
+  cada: Periodicidad
+  /** Solo en los mensuales: qué día del mes cae. */
+  diaDelMes?: number
+  /** Solo en los de cada dos meses: mes de referencia (0 = enero). */
+  anclaMes?: number
+  /** Quién lo paga o lo cobra. Si se reparte, va en aportaciones. */
+  quien: MiembroId
+  /** Cuando lo pagan entre los dos, con montos distintos. */
+  aportaciones?: { miembro: MiembroId; monto: number }[]
+  /** El monto cambia cada vez: al confirmarlo se captura el real. */
+  variable?: boolean
+  activo: boolean
+}
+
+export interface Movimiento {
+  id: string
+  tipo: TipoMovimiento
+  monto: number
+  categoria: string
+  fecha: string
+  /** Quién pagó o a quién le entró. */
+  miembro: MiembroId
+  nota?: string
+  /** Si vino de un cargo fijo, para no volverlo a pedir. */
+  cargoId?: string
+  /** Qué ocurrencia del cargo fijo cubre: '2026-08', '2026-08-q2', '2026-W34'. */
+  periodo?: string
+}
+
+export interface MetaIngreso {
+  miembro: MiembroId
+  monto: number
+  periodo: 'semanal'
+}
+
 /** Qué tanto de la casa se ve en la pantalla de Hoy. */
 export type Vista = 'mias' | 'mias_y_ambos' | 'todas'
 
@@ -79,4 +127,7 @@ export interface Estado {
   tareas: Tarea[]
   eventos: Evento[]
   recordatorios: Recordatorio[]
+  cargosFijos: CargoFijo[]
+  movimientos: Movimiento[]
+  metas: MetaIngreso[]
 }

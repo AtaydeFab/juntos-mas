@@ -1,6 +1,6 @@
 import { useSyncExternalStore } from 'react'
-import type { Estado, Evento, MiembroId, Plantilla, Recordatorio, Responsable, Tarea, Dia, Vista } from './types'
-import { PLANTILLAS, RECORDATORIOS } from './seed'
+import type { Estado, Evento, MiembroId, Movimiento, Plantilla, Recordatorio, Responsable, Tarea, Dia, Vista } from './types'
+import { CARGOS_FIJOS, METAS, PLANTILLAS, RECORDATORIOS } from './seed'
 import { dia, desdeYmd, hoy, indiceSemana, lunesDe, semanaDe, sumarDias, ymd } from './dates'
 
 const LLAVE = 'juntos.v1'
@@ -15,6 +15,9 @@ function inicial(): Estado {
     tareas: [],
     eventos: [],
     recordatorios: RECORDATORIOS,
+    cargosFijos: CARGOS_FIJOS,
+    movimientos: [],
+    metas: METAS,
   }
 }
 
@@ -202,6 +205,34 @@ export function cambiarYo(yo: MiembroId) {
   guardar({ ...estado, yo })
 }
 
+export function agregarMovimiento(m: Omit<Movimiento, 'id'>) {
+  guardar({ ...estado, movimientos: [...estado.movimientos, { ...m, id: id() }] })
+}
+
+/** Confirma un cargo fijo: si se reparte, deja un movimiento por persona. */
+export function confirmarCargo(cargoId: string, periodo: string, fecha: string, montoReal?: number) {
+  const cargo = estado.cargosFijos.find(c => c.id === cargoId)
+  if (!cargo) return
+  const total = montoReal ?? cargo.monto
+  const base = { tipo: cargo.tipo, categoria: cargo.categoria, fecha, cargoId, periodo, nota: cargo.titulo }
+
+  const nuevos: Movimiento[] = cargo.aportaciones?.length
+    ? cargo.aportaciones.map(a => ({
+        ...base,
+        id: id(),
+        miembro: a.miembro,
+        // Si el monto real cambió, se reparte en la misma proporción acordada.
+        monto: Math.round(total * (a.monto / cargo.monto)),
+      }))
+    : [{ ...base, id: id(), miembro: cargo.quien, monto: total }]
+
+  guardar({ ...estado, movimientos: [...estado.movimientos, ...nuevos] })
+}
+
+export function borrarMovimiento(movimientoId: string) {
+  guardar({ ...estado, movimientos: estado.movimientos.filter(m => m.id !== movimientoId) })
+}
+
 export function cambiarVista(vista: Vista) {
   guardar({ ...estado, vista })
 }
@@ -233,6 +264,9 @@ export function importar(texto: string): { ok: boolean; mensaje: string } {
     tareas: datos.tareas,
     eventos: datos.eventos ?? [],
     recordatorios: datos.recordatorios ?? [],
+    cargosFijos: datos.cargosFijos ?? CARGOS_FIJOS,
+    movimientos: datos.movimientos ?? [],
+    metas: datos.metas ?? METAS,
   })
   return { ok: true, mensaje: 'Listo, se restauró el respaldo.' }
 }

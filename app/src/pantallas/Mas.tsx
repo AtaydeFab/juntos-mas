@@ -72,8 +72,9 @@ export default function Mas() {
       <div className="seccion"><span>Lo que sigue (interno)</span></div>
       <div className="panel">
         <p className="nota" style={{ fontSize: 14 }}>
-          <b style={{ color: 'var(--ink)' }}>Próxima entrega:</b> el dinero — ingresos, gastos fijos que entran solos,
-          ahorro y el resumen del mes. Después: las cuentas de los cuatro y que todo se sincronice entre teléfonos.
+          <b style={{ color: 'var(--ink)' }}>Ya está:</b> tareas, calendario, recordatorios y dinero.<br />
+          <b style={{ color: 'var(--ink)' }}>Falta:</b> las cuentas de los cuatro, para que lo que uno palomee o
+          registre le aparezca al otro al instante.
         </p>
       </div>
 
