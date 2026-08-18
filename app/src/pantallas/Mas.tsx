@@ -5,6 +5,7 @@ import { useNube, olvidarNube, bajar, vaciarCola } from '../nube/sincronizacion'
 import { salir } from '../nube/sesion'
 import { dejarDeUsarSoloLocal, usarSoloLocal } from './Entrar'
 import { hayNube } from '../nube/cliente'
+import { comoInstalarAMano, instalar, useInstalacion } from '../instalar'
 import { MIEMBROS, miembro } from '../seed'
 import type { MiembroId, Responsable } from '../types'
 
@@ -27,6 +28,7 @@ export default function Mas() {
       </header>
 
       <LaNube />
+      <Instalacion />
 
       <div className="panel">
         <span className="k">¿Quién está usando este teléfono?</span>
@@ -213,6 +215,33 @@ function LaNube() {
         }}>
         Cerrar sesión
       </button>
+    </div>
+  )
+}
+
+/** Ponerla en la pantalla de inicio, con botón si el navegador deja. */
+function Instalacion() {
+  const { instalada, sePuede } = useInstalacion()
+
+  if (instalada) {
+    return (
+      <div className="panel">
+        <span className="k">En tu pantalla</span>
+        <p className="nota">Ya está instalada en este teléfono. Se abre como cualquier otra app.</p>
+      </div>
+    )
+  }
+
+  return (
+    <div className="panel">
+      <span className="k">Ponerla en tu pantalla</span>
+      <p className="nota">
+        Queda con su ícono junto a las demás apps y abre en pantalla completa, sin tener que
+        acordarse de ninguna dirección.
+      </p>
+      {sePuede
+        ? <button className="btn" type="button" onClick={() => void instalar()}>Ponerla en la pantalla</button>
+        : <p className="nota">{comoInstalarAMano()}</p>}
     </div>
   )
 }

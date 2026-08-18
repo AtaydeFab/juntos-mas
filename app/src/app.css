@@ -477,6 +477,22 @@ h1, h2, h3 { font-family: var(--display); font-weight: 600; margin: 0; letter-sp
 .evento .txt small { display: block; font-size: 12px; color: var(--muted); }
 .evento.pronto { border-color: var(--ni); }
 
+.invitacion {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 12px;
+  align-items: center;
+  background: var(--fa-soft);
+  border-radius: var(--radius);
+  padding: 12px 14px;
+  margin-top: 10px;
+}
+.invitacion b { font-size: 14.5px; display: block; }
+.invitacion small { font-size: 12px; color: var(--muted); }
+.invitacion-botones { display: grid; gap: 4px; justify-items: center; }
+.invitacion .btn { width: auto; padding: 9px 14px; font-size: 13.5px; }
+.invitacion .enlace { font-size: 12px; }
+
 .cinta {
   background: var(--ni-soft);
   color: var(--ni);

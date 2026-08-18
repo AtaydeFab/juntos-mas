@@ -7,6 +7,7 @@ import Dinero from './pantallas/Dinero'
 import Mas from './pantallas/Mas'
 import Entrar, { quiereSoloLocal } from './pantallas/Entrar'
 import { arrancarNube, useNube } from './nube/sincronizacion'
+import { esconderInvitacion, instalar, useInstalacion } from './instalar'
 import { Hoja, Interruptor, SelectorMiembro } from './componentes'
 import { agregarEvento, agregarMovimiento, agregarTarea, confirmarCargo, materializarSemana, useEstado } from './store'
 import { CATEGORIAS_GASTO, CATEGORIAS_INGRESO, pesos } from './seed'
@@ -32,6 +33,7 @@ const NOMBRES: Record<Pestana, string> = {
 export default function App() {
   const estado = useEstado()
   const { conexion, pendientes } = useNube()
+  const instalacion = useInstalacion()
   const [pestana, setPestana] = useState<Pestana>('hoy')
   const [saltarEntrada, setSaltarEntrada] = useState(quiereSoloLocal())
   const [hojaAbierta, setHojaAbierta] = useState<'tarea' | 'evento' | 'movimiento' | null>(null)
@@ -52,6 +54,19 @@ export default function App() {
 
   return (
     <div className="app">
+      {instalacion.sePuede && !instalacion.instalada && !instalacion.escondido && (
+        <div className="invitacion">
+          <span>
+            <b>Ponla en tu pantalla de inicio</b>
+            <small>Se abre como app, sin buscar la dirección.</small>
+          </span>
+          <span className="invitacion-botones">
+            <button className="btn" type="button" onClick={() => void instalar()}>Ponerla</button>
+            <button className="enlace" type="button" onClick={esconderInvitacion}>Ahora no</button>
+          </span>
+        </div>
+      )}
+
       {(conexion === 'sin-señal' || pendientes > 0) && (
         <div className="cinta">
           Sin señal · {pendientes} {pendientes === 1 ? 'cambio guardado aquí' : 'cambios guardados aquí'}
