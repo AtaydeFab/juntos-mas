@@ -1,6 +1,10 @@
 import { useRef, useState } from 'react'
 import { useEstado, cambiarYo, agregarRecordatorio, borrarRecordatorio, reiniciar, exportar, importar } from '../store'
 import { Avatar, SelectorMiembro } from '../componentes'
+import { useNube, olvidarNube, bajar, vaciarCola } from '../nube/sincronizacion'
+import { salir } from '../nube/sesion'
+import { dejarDeUsarSoloLocal, usarSoloLocal } from './Entrar'
+import { hayNube } from '../nube/cliente'
 import { MIEMBROS, miembro } from '../seed'
 import type { MiembroId, Responsable } from '../types'
 
@@ -22,12 +26,13 @@ export default function Mas() {
         <span className="sub">Juntos+ · versión 0.1</span>
       </header>
 
+      <LaNube />
+
       <div className="panel">
         <span className="k">¿Quién está usando este teléfono?</span>
         <SelectorMiembro valor={estado.yo} onCambio={(v: Responsable) => { if (v !== 'ambos' && v !== 'turno') cambiarYo(v) }} />
         <p className="nota">
-          Por ahora cada teléfono guarda lo suyo. En la siguiente entrega se conectan las cuentas
-          y lo que uno palomea le aparece al otro al instante.
+          Con la casa conectada, esto lo define tu cuenta y no se cambia a mano.
         </p>
       </div>
 
@@ -126,6 +131,88 @@ function Respaldo() {
       <input ref={entrada} type="file" accept="application/json,.json" hidden
         onChange={e => { void subir(e.target.files?.[0]); e.target.value = '' }} />
       {aviso && <p className="nota" style={{ color: 'var(--good)' }}>{aviso}</p>}
+    </div>
+  )
+}
+
+/** Estado de la conexión, el código para invitar y la salida. */
+function LaNube() {
+  const estado = useEstado()
+  const { conexion, pendientes } = useNube()
+  const [copiado, setCopiado] = useState(false)
+
+  if (!hayNube) return null
+
+  if (!estado.nube) {
+    return (
+      <div className="panel">
+        <span className="k">La casa</span>
+        <p className="nota">
+          Ahorita todo se queda en este teléfono. Si entras con tu cuenta, lo que hagas le llega
+          también a los demás.
+        </p>
+        <button className="btn" type="button"
+          onClick={() => { dejarDeUsarSoloLocal(); location.reload() }}>
+          Conectar con la casa
+        </button>
+      </div>
+    )
+  }
+
+  const dice: Record<string, string> = {
+    listo: 'Al día',
+    sincronizando: 'Poniéndose al día…',
+    'sin-señal': 'Sin señal · se sube solo cuando vuelva',
+    error: 'Algo falló',
+    'sin-sesion': 'Se cerró la sesión',
+    'sin-casa': 'Sin casa',
+    'sin-nube': 'Solo en este teléfono',
+  }
+
+  const copiar = async () => {
+    try {
+      await navigator.clipboard.writeText(estado.nube!.codigo)
+      setCopiado(true)
+      setTimeout(() => setCopiado(false), 2500)
+    } catch {
+      setCopiado(false)
+    }
+  }
+
+  return (
+    <div className="panel">
+      <span className="k">La casa</span>
+      <p style={{ margin: 0, fontSize: 15 }}>
+        <b>{dice[conexion] ?? conexion}</b>
+        {pendientes > 0 ? ` · ${pendientes} por subir` : ''}
+      </p>
+      <p className="nota">Entraste como {estado.nube.correo}</p>
+
+      <div className="regla" />
+      <span className="k">Código para invitar</span>
+      <p className="codigo">{estado.nube.codigo}</p>
+      <p className="nota">
+        Con este código entran los demás desde su teléfono: escogen su nombre y ya.
+      </p>
+      <button className="btn fantasma" type="button" onClick={() => void copiar()}>
+        {copiado ? 'Copiado' : 'Copiar el código'}
+      </button>
+
+      <div className="regla" />
+      <button className="btn fantasma" type="button"
+        onClick={() => void vaciarCola().then(() => bajar())}>
+        Ponerse al día ahora
+      </button>
+      <button className="btn peligro" type="button"
+        onClick={async () => {
+          if (!confirm('¿Cerrar la sesión en este teléfono?')) return
+          await salir()
+          olvidarNube()
+          usarSoloLocal()
+          location.reload()
+        }}>
+        Cerrar sesión
+      </button>
     </div>
   )
 }

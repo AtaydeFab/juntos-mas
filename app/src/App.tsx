@@ -5,6 +5,8 @@ import Semana from './pantallas/Semana'
 import Calendario from './pantallas/Calendario'
 import Dinero from './pantallas/Dinero'
 import Mas from './pantallas/Mas'
+import Entrar, { quiereSoloLocal } from './pantallas/Entrar'
+import { arrancarNube, useNube } from './nube/sincronizacion'
 import { Hoja, Interruptor, SelectorMiembro } from './componentes'
 import { agregarEvento, agregarMovimiento, agregarTarea, confirmarCargo, materializarSemana, useEstado } from './store'
 import { CATEGORIAS_GASTO, CATEGORIAS_INGRESO, pesos } from './seed'
@@ -29,7 +31,9 @@ const NOMBRES: Record<Pestana, string> = {
 
 export default function App() {
   const estado = useEstado()
+  const { conexion, pendientes } = useNube()
   const [pestana, setPestana] = useState<Pestana>('hoy')
+  const [saltarEntrada, setSaltarEntrada] = useState(quiereSoloLocal())
   const [hojaAbierta, setHojaAbierta] = useState<'tarea' | 'evento' | 'movimiento' | null>(null)
   const [cargoPorCapturar, setCargoPorCapturar] = useState<Ocurrencia | null>(null)
 
@@ -39,13 +43,24 @@ export default function App() {
   }
 
   useEffect(() => { materializarSemana(lunesDe(hoy())) }, [])
+  useEffect(() => { void arrancarNube() }, [])
+
+  const pideEntrar = (conexion === 'sin-sesion' || conexion === 'sin-casa') && !saltarEntrada
+  if (pideEntrar) return <Entrar onListo={() => setSaltarEntrada(true)} />
+
+  const esHija = estado.yo === 'vi' || estado.yo === 'so'
 
   return (
     <div className="app">
+      {(conexion === 'sin-señal' || pendientes > 0) && (
+        <div className="cinta">
+          Sin señal · {pendientes} {pendientes === 1 ? 'cambio guardado aquí' : 'cambios guardados aquí'}
+        </div>
+      )}
       {pestana === 'hoy' && <Hoy />}
       {pestana === 'semana' && <Semana />}
       {pestana === 'calendario' && <Calendario />}
-      {pestana === 'dinero' && <Dinero onCapturar={capturarCargo} />}
+      {pestana === 'dinero' && !esHija && <Dinero onCapturar={capturarCargo} />}
       {pestana === 'mas' && <Mas />}
 
       {pestana !== 'mas' && (
@@ -68,7 +83,7 @@ export default function App() {
       )}
 
       <nav className="nav">
-        {(Object.keys(NOMBRES) as Pestana[]).map(p => (
+        {(Object.keys(NOMBRES) as Pestana[]).filter(p => !(esHija && p === 'dinero')).map(p => (
           <button key={p} type="button" className={pestana === p ? 'on' : ''}
             aria-current={pestana === p ? 'page' : undefined} onClick={() => setPestana(p)}>
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round">

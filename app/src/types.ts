@@ -119,6 +119,14 @@ export interface MetaIngreso {
 /** Qué tanto de la casa se ve en la pantalla de Hoy. */
 export type Vista = 'mias' | 'mias_y_ambos' | 'todas'
 
+/** Datos de la casa en la nube, una vez que se entró. */
+export interface Nube {
+  hogarId: string
+  miembroId: string
+  codigo: string
+  correo: string
+}
+
 export interface Estado {
   version: number
   yo: MiembroId
@@ -130,4 +138,5 @@ export interface Estado {
   cargosFijos: CargoFijo[]
   movimientos: Movimiento[]
   metas: MetaIngreso[]
+  nube?: Nube
 }

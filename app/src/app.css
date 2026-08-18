@@ -477,6 +477,40 @@ h1, h2, h3 { font-family: var(--display); font-weight: 600; margin: 0; letter-sp
 .evento .txt small { display: block; font-size: 12px; color: var(--muted); }
 .evento.pronto { border-color: var(--ni); }
 
+.cinta {
+  background: var(--ni-soft);
+  color: var(--ni);
+  font-size: 12.5px;
+  text-align: center;
+  padding: 7px 10px;
+  border-radius: 10px;
+  margin: 10px 0 0;
+}
+
+.codigo {
+  font-family: var(--mono);
+  font-size: 27px;
+  letter-spacing: 0.22em;
+  text-align: center;
+  margin: 2px 0;
+  padding: 10px;
+  background: var(--surface-2);
+  border-radius: 12px;
+}
+
+.error {
+  color: var(--sa);
+  font-size: 13.5px;
+  margin: 0;
+}
+
+.entrada { justify-content: center; padding-bottom: 40px; }
+.cab-entrada { display: grid; justify-items: center; gap: 6px; padding: 40px 0 26px; text-align: center; }
+.cab-entrada h1 { font-size: 30px; }
+.cab-entrada p { color: var(--muted); font-size: 15px; margin: 0; }
+
+.nav { grid-auto-flow: column; }
+
 .vacio {
   text-align: center;
   color: var(--muted);

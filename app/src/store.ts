@@ -1,5 +1,5 @@
 import { useSyncExternalStore } from 'react'
-import type { Estado, Evento, MiembroId, Movimiento, Plantilla, Recordatorio, Responsable, Tarea, Dia, Vista } from './types'
+import type { Estado, Evento, MiembroId, Movimiento, Nube, Plantilla, Recordatorio, Responsable, Tarea, Dia, Vista } from './types'
 import { CARGOS_FIJOS, METAS, PLANTILLAS, RECORDATORIOS } from './seed'
 import { dia, desdeYmd, hoy, indiceSemana, lunesDe, semanaDe, sumarDias, ymd } from './dates'
 
@@ -38,7 +38,14 @@ function leer(): Estado {
 let estado: Estado = typeof localStorage === 'undefined' ? inicial() : leer()
 const oyentes = new Set<() => void>()
 
-function guardar(nuevo: Estado) {
+/** La sincronización se engancha aquí para enterarse de cada cambio local. */
+let observador: ((antes: Estado, despues: Estado) => void) | null = null
+export function observarCambios(fn: (antes: Estado, despues: Estado) => void) {
+  observador = fn
+}
+
+function guardar(nuevo: Estado, deLaNube = false) {
+  const antes = estado
   estado = nuevo
   try {
     localStorage.setItem(LLAVE, JSON.stringify(nuevo))
@@ -46,6 +53,20 @@ function guardar(nuevo: Estado) {
     // Si no se puede guardar, la app sigue funcionando en memoria.
   }
   oyentes.forEach(fn => fn())
+  if (!deLaNube) observador?.(antes, nuevo)
+}
+
+/** Aplica lo que llegó de la nube sin volver a mandarlo de regreso. */
+export function aplicarDeLaNube(parcial: Partial<Estado>) {
+  guardar({ ...estado, ...parcial }, true)
+}
+
+export function fijarNube(nube: Nube | undefined) {
+  guardar({ ...estado, nube }, true)
+}
+
+export function estadoActual(): Estado {
+  return estado
 }
 
 export function useEstado(): Estado {
@@ -59,7 +80,43 @@ export function useEstado(): Estado {
   )
 }
 
-const id = () => Math.random().toString(36).slice(2, 10)
+const id = () =>
+  typeof crypto !== 'undefined' && 'randomUUID' in crypto
+    ? crypto.randomUUID()
+    : `${Date.now().toString(16)}-${Math.random().toString(16).slice(2, 10)}`
+
+const esUuid = (v: string) => /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(v)
+
+/**
+ * Lo que se creó antes de conectar la nube trae identificadores cortos y la
+ * base pide UUID. Esto los renombra respetando las referencias entre filas.
+ */
+export function volverIdsUuid() {
+  const nuevo = new Map<string, string>()
+  const traducir = (v: string) => {
+    if (esUuid(v)) return v
+    if (!nuevo.has(v)) nuevo.set(v, id())
+    return nuevo.get(v)!
+  }
+
+  guardar({
+    ...estado,
+    plantillas: estado.plantillas.map(p => ({ ...p, id: traducir(p.id) })),
+    tareas: estado.tareas.map(t => ({
+      ...t,
+      id: traducir(t.id),
+      plantillaId: t.plantillaId ? traducir(t.plantillaId) : undefined,
+    })),
+    eventos: estado.eventos.map(e => ({ ...e, id: traducir(e.id) })),
+    recordatorios: estado.recordatorios.map(r => ({ ...r, id: traducir(r.id) })),
+    cargosFijos: estado.cargosFijos.map(c => ({ ...c, id: traducir(c.id) })),
+    movimientos: estado.movimientos.map(v => ({
+      ...v,
+      id: traducir(v.id),
+      cargoId: v.cargoId ? traducir(v.cargoId) : undefined,
+    })),
+  }, true)
+}
 
 /** A quién le toca esta semana una tarea de turno rotativo. */
 export function turnoDeLaSemana(entre: MiembroId[], fecha: Date): MiembroId {
