@@ -117,6 +117,56 @@ export interface MetaIngreso {
   periodo: 'semanal'
 }
 
+// ------------------------------------------------------------------ comida
+
+/** Los tres tiempos del día en esta casa. */
+export type Tiempo = 'almuerzo' | 'comida' | 'cena'
+
+/** Por dónde cae cada cosa en el súper, para no andar dando vueltas. */
+export type Pasillo = 'verdura' | 'carne' | 'lacteos' | 'abarrotes' | 'otros'
+
+export interface Ingrediente {
+  que: string
+  cuanto?: string
+  pasillo: Pasillo
+}
+
+export interface Receta {
+  id: string
+  titulo: string
+  /** En qué tiempos cae bien. */
+  tiempos: Tiempo[]
+  minutos: number
+  porciones: number
+  ingredientes: Ingrediente[]
+  pasos: string[]
+  nota?: string
+  /** La escribieron en esta casa; las demás vienen con la app. */
+  deLaCasa?: boolean
+}
+
+/** Lo que toca comer un día, a una hora. */
+export interface Comida {
+  id: string
+  fecha: string
+  tiempo: Tiempo
+  titulo: string
+  recetaId?: string
+  /** Quién se comprometió a hacerla. */
+  cocina?: MiembroId
+  listo: boolean
+}
+
+export interface ItemSuper {
+  id: string
+  que: string
+  cuanto?: string
+  pasillo: Pasillo
+  comprado: boolean
+  /** De qué platillo salió, para saber por qué está en la lista. */
+  deReceta?: string
+}
+
 /** Qué tanto de la casa se ve en la pantalla de Hoy. */
 export type Vista = 'mias' | 'mias_y_ambos' | 'todas'
 
@@ -139,5 +189,8 @@ export interface Estado {
   cargosFijos: CargoFijo[]
   movimientos: Movimiento[]
   metas: MetaIngreso[]
+  comidas: Comida[]
+  recetas: Receta[]
+  super: ItemSuper[]
   nube?: Nube
 }

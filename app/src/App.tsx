@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import './app.css'
 import Hoy from './pantallas/Hoy'
 import Semana from './pantallas/Semana'
+import ComidaPantalla from './pantallas/Comida'
 import Calendario from './pantallas/Calendario'
 import Dinero from './pantallas/Dinero'
 import Mas from './pantallas/Mas'
@@ -16,18 +17,19 @@ import { diaCorto, hoy, lunesDe, sumarDias, ymd } from './dates'
 import type { MiembroId, Responsable, TipoMovimiento } from './types'
 import { MIEMBROS } from './seed'
 
-type Pestana = 'hoy' | 'semana' | 'calendario' | 'dinero' | 'mas'
+type Pestana = 'hoy' | 'semana' | 'comida' | 'calendario' | 'dinero' | 'mas'
 
 const ICONOS: Record<Pestana, string> = {
   hoy: 'M4 12.5l5.5 5.5L20 6.5',
   semana: 'M3 8h18M3 14h18M8 4v16M16 4v16',
+  comida: 'M5 3v8a2 2 0 002 2v8M9 3v6M19 3c-1.5 1.5-2 3.5-2 6s.7 3 2 3v9',
   calendario: 'M4 6h16v14H4zM4 10h16M9 3v4M15 3v4',
   dinero: 'M12 4v16M8 8h6a2 2 0 010 4H10a2 2 0 000 4h6',
   mas: 'M5 12h.01M12 12h.01M19 12h.01',
 }
 
 const NOMBRES: Record<Pestana, string> = {
-  hoy: 'Hoy', semana: 'Semana', calendario: 'Calendario', dinero: 'Dinero', mas: 'Más',
+  hoy: 'Hoy', semana: 'Semana', comida: 'Comida', calendario: 'Calendario', dinero: 'Dinero', mas: 'Más',
 }
 
 export default function App() {
@@ -74,11 +76,12 @@ export default function App() {
       )}
       {pestana === 'hoy' && <Hoy />}
       {pestana === 'semana' && <Semana />}
+      {pestana === 'comida' && <ComidaPantalla />}
       {pestana === 'calendario' && <Calendario />}
       {pestana === 'dinero' && !esHija && <Dinero onCapturar={capturarCargo} />}
       {pestana === 'mas' && <Mas />}
 
-      {pestana !== 'mas' && (
+      {pestana !== 'mas' && pestana !== 'comida' && (
         <button className="fab" type="button"
           aria-label={
             pestana === 'calendario' ? 'Agendar algo'

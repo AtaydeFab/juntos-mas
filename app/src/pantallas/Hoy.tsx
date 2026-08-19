@@ -3,6 +3,7 @@ import { useEstado, palomear, cambiarVista } from '../store'
 import { FilaTarea, responsableEfectivo } from '../componentes'
 import { faltan, fechaLarga, hoy, proximaFecha, semanaDe, ymd, desdeYmd, mesCorto } from '../dates'
 import { miembro } from '../seed'
+import { ComidaDeHoy } from './Comida'
 import type { Tarea, Vista } from '../types'
 
 function detalleDe(t: Tarea): string {
@@ -67,6 +68,8 @@ export default function Hoy() {
       {recordatoriosMios.length > 0 && (
         <Recordatorio textos={recordatoriosMios.map(r => r.texto)} dia={hoyD.getDate()} />
       )}
+
+      <ComidaDeHoy />
 
       {proximos.length > 0 && (
         <>

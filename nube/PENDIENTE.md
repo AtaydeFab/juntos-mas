@@ -47,3 +47,23 @@ regresarían solas.
 El *service worker* trae la página de la red cuando hay señal y solo usa lo
 guardado si no la hay. Así, cuando se publica una versión nueva, llega al
 teléfono al abrir la app; antes se quedaba pegada la primera que se instaló.
+
+## La comida
+
+Tres cosas, en su propia pestaña:
+
+- **Menú**: los tres tiempos de cada día de la semana. La app puede proponer la
+  semana entera con platillos variados y de ahí se cambia lo que no les late;
+  cada tiempo se puede escribir a mano ("sobras", "salimos a cenar") y se puede
+  apuntar quién lo cocina.
+- **Súper**: la lista se arma sola con los ingredientes de lo planeado, agrupada
+  por pasillo. Lo que se repite se junta en un renglón con las cantidades
+  sumadas —"Jitomate · 28 · para 9 platillos"—. Cualquiera de los cuatro puede
+  agregar cosas, no solo los adultos.
+- **Recetas**: 24 platillos vienen con la app, escritos paso a paso para alguien
+  que no cocina seguido. Las que escriban ustedes se guardan aparte y sí viajan
+  a la nube; las de fábrica viven en el código, iguales en los dos teléfonos.
+
+Necesita `esquema-4.sql`. Mientras esa parte no esté en la base, la app no se
+rompe: guarda el menú en el teléfono, deja lo demás sincronizando normal y sube
+la comida sola en cuanto las tablas existan.

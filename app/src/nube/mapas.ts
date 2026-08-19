@@ -1,5 +1,6 @@
 import type {
-  CargoFijo, Evento, MetaIngreso, MiembroId, Movimiento, Plantilla, Recordatorio, Responsable, Tarea, Dia,
+  CargoFijo, Comida, Evento, Ingrediente, ItemSuper, MetaIngreso, MiembroId, Movimiento, Pasillo,
+  Plantilla, Receta, Recordatorio, Responsable, Tarea, Tiempo, Dia,
 } from '../types'
 
 /** Traduce entre los identificadores cortos de la app (fa, sa…) y los de la base. */
@@ -28,7 +29,10 @@ const respALocal = (r: string, m: MapaMiembros): Responsable =>
 /** Las filas de la base, tal como viajan por la red. */
 export type Fila = Record<string, unknown>
 
-export const TABLAS = ['plantilla', 'tarea', 'evento', 'recordatorio', 'cargo_fijo', 'movimiento', 'meta_ingreso'] as const
+export const TABLAS = [
+  'plantilla', 'tarea', 'evento', 'recordatorio', 'cargo_fijo', 'movimiento', 'meta_ingreso',
+  'comida', 'receta', 'articulo_super',
+] as const
 export type Tabla = (typeof TABLAS)[number]
 
 // ------------------------------------------------------------ hacia la base
@@ -139,6 +143,48 @@ export function metaAFila(m: MetaIngreso, hogar: string, mapa: MapaMiembros): Fi
   }
 }
 
+export function comidaAFila(c: Comida, hogar: string, m: MapaMiembros): Fila {
+  return {
+    id: c.id,
+    hogar_id: hogar,
+    fecha: c.fecha,
+    tiempo: c.tiempo,
+    titulo: c.titulo,
+    receta_id: c.recetaId ?? null,
+    cocina: c.cocina ? (m.aUuid[c.cocina] ?? null) : null,
+    listo: c.listo,
+    borrado_en: null,
+  }
+}
+
+export function recetaAFila(r: Receta, hogar: string): Fila {
+  return {
+    id: r.id,
+    hogar_id: hogar,
+    titulo: r.titulo,
+    tiempos: r.tiempos,
+    minutos: r.minutos,
+    porciones: r.porciones,
+    ingredientes: r.ingredientes,
+    pasos: r.pasos,
+    nota: r.nota ?? null,
+    borrado_en: null,
+  }
+}
+
+export function itemSuperAFila(i: ItemSuper, hogar: string): Fila {
+  return {
+    id: i.id,
+    hogar_id: hogar,
+    que: i.que,
+    cuanto: i.cuanto ?? null,
+    pasillo: i.pasillo,
+    comprado: i.comprado,
+    de_receta: i.deReceta ?? null,
+    borrado_en: null,
+  }
+}
+
 // ------------------------------------------------------------ desde la base
 
 export function filaAPlantilla(f: Fila, m: MapaMiembros): Plantilla {
@@ -233,5 +279,42 @@ export function filaAMeta(f: Fila, m: MapaMiembros): MetaIngreso {
     miembro: m.aLocal[f.miembro_id as string] ?? 'sa',
     monto: Number(f.monto),
     periodo: (f.periodo as MetaIngreso['periodo']) ?? 'semanal',
+  }
+}
+
+export function filaAComida(f: Fila, m: MapaMiembros): Comida {
+  return {
+    id: f.id as string,
+    fecha: f.fecha as string,
+    tiempo: f.tiempo as Tiempo,
+    titulo: f.titulo as string,
+    recetaId: (f.receta_id as string) ?? undefined,
+    cocina: f.cocina ? m.aLocal[f.cocina as string] : undefined,
+    listo: Boolean(f.listo),
+  }
+}
+
+export function filaAReceta(f: Fila): Receta {
+  return {
+    id: f.id as string,
+    titulo: f.titulo as string,
+    tiempos: ((f.tiempos as string[]) ?? ['comida']) as Tiempo[],
+    minutos: Number(f.minutos) || 30,
+    porciones: Number(f.porciones) || 4,
+    ingredientes: ((f.ingredientes as Ingrediente[]) ?? []),
+    pasos: ((f.pasos as string[]) ?? []),
+    nota: (f.nota as string) ?? undefined,
+    deLaCasa: true,
+  }
+}
+
+export function filaAItemSuper(f: Fila): ItemSuper {
+  return {
+    id: f.id as string,
+    que: f.que as string,
+    cuanto: (f.cuanto as string) ?? undefined,
+    pasillo: (f.pasillo as Pasillo) ?? 'otros',
+    comprado: Boolean(f.comprado),
+    deReceta: (f.de_receta as string) ?? undefined,
   }
 }

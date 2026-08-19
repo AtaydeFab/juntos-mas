@@ -4,8 +4,9 @@ import { miPerfil, type Perfil } from './sesion'
 import { aplicarDeLaNube, cambiarYo, estadoActual, fijarNube, observarCambios, volverIdsUuid } from '../store'
 import type { Estado } from '../types'
 import {
-  cargoAFila, eventoAFila, filaACargo, filaAEvento, filaAMeta, filaAMovimiento, filaAPlantilla,
-  filaARecordatorio, filaATarea, metaAFila, movimientoAFila, plantillaAFila, recordatorioAFila, tareaAFila,
+  cargoAFila, comidaAFila, eventoAFila, filaACargo, filaAComida, filaAEvento, filaAItemSuper, filaAMeta,
+  filaAMovimiento, filaAPlantilla, filaAReceta, filaARecordatorio, filaATarea, itemSuperAFila, metaAFila,
+  movimientoAFila, plantillaAFila, recetaAFila, recordatorioAFila, tareaAFila,
   type Fila, type Tabla,
 } from './mapas'
 
@@ -82,7 +83,9 @@ export function useNube(): VistaNube {
 
 // --------------------------------------------------------------- diferencias
 
-type Coleccion = 'plantillas' | 'tareas' | 'eventos' | 'recordatorios' | 'cargosFijos' | 'movimientos' | 'metas'
+type Coleccion =
+  | 'plantillas' | 'tareas' | 'eventos' | 'recordatorios' | 'cargosFijos' | 'movimientos' | 'metas'
+  | 'comidas' | 'recetas' | 'super'
 
 /** Estas dos no tienen marca de borrado: una se desactiva, la otra se quita de veras. */
 const SIN_MARCA_DE_BORRADO = new Set<Tabla>(['plantilla', 'meta_ingreso'])
@@ -95,6 +98,9 @@ const TABLA_DE: Record<Coleccion, Tabla> = {
   cargosFijos: 'cargo_fijo',
   movimientos: 'movimiento',
   metas: 'meta_ingreso',
+  comidas: 'comida',
+  recetas: 'receta',
+  super: 'articulo_super',
 }
 
 function aFila(coleccion: Coleccion, dato: unknown, p: Perfil, yo: Estado['yo']): Fila {
@@ -106,6 +112,9 @@ function aFila(coleccion: Coleccion, dato: unknown, p: Perfil, yo: Estado['yo'])
     case 'cargosFijos': return cargoAFila(dato as never, p.hogarId, p.mapa)
     case 'movimientos': return movimientoAFila(dato as never, p.hogarId, p.mapa)
     case 'metas': return metaAFila(dato as never, p.hogarId, p.mapa)
+    case 'comidas': return comidaAFila(dato as never, p.hogarId, p.mapa)
+    case 'recetas': return recetaAFila(dato as never, p.hogarId)
+    case 'super': return itemSuperAFila(dato as never, p.hogarId)
   }
 }
 
@@ -154,13 +163,24 @@ function encolar(nuevas: Operacion[]) {
 
 let vaciando = false
 
+/**
+ * Tablas que la base todavía no tiene, porque falta correr un pedazo del
+ * esquema. No se descarta lo que iba para ellas: se deja esperando y el resto
+ * sigue subiendo. Al volver a abrir la app se intenta otra vez.
+ */
+const sinTabla = new Set<Tabla>()
+const noExiste = (codigo: string) => codigo === '42P01' || codigo === 'PGRST205'
+
 export async function vaciarCola(): Promise<void> {
   if (!nube || !perfil || vaciando || !cola.length) return
   vaciando = true
 
   try {
-    while (cola.length) {
-      const op = cola[0]
+    for (;;) {
+      const indice = cola.findIndex(o => !sinTabla.has(o.tabla))
+      if (indice < 0) break
+      const op = cola[indice]
+
       const { error } = op.borrar
         ? SIN_MARCA_DE_BORRADO.has(op.tabla)
           ? await nube.from(op.tabla).delete().eq('id', op.fila.id as string)
@@ -168,11 +188,16 @@ export async function vaciarCola(): Promise<void> {
         : await nube.from(op.tabla).upsert(op.fila)
 
       if (error) {
+        const codigo = (error as { code?: string }).code ?? ''
+        if (noExiste(codigo)) {
+          // Falta esa tabla en la base: se salta y lo demás sigue su camino.
+          sinTabla.add(op.tabla)
+          continue
+        }
         // Permiso denegado o duplicado: esa fila no va a entrar nunca, se descarta
         // para que no atore a las demás. Lo de red sí se reintenta después.
-        const codigo = (error as { code?: string }).code ?? ''
         if (['42501', '23505', '23503', '22P02', '42703'].includes(codigo)) {
-          cola = cola.slice(1)
+          cola = cola.filter((_, i) => i !== indice)
           guardarCola()
           continue
         }
@@ -180,7 +205,7 @@ export async function vaciarCola(): Promise<void> {
         return
       }
 
-      cola = cola.slice(1)
+      cola = cola.filter((_, i) => i !== indice)
       guardarCola()
       avisar()
     }
@@ -197,7 +222,10 @@ export async function bajar(): Promise<void> {
   const p = perfil
   const conexionNube = nube
 
-  const tablas: Tabla[] = ['plantilla', 'tarea', 'evento', 'recordatorio', 'cargo_fijo', 'movimiento', 'meta_ingreso']
+  const tablas: Tabla[] = [
+    'plantilla', 'tarea', 'evento', 'recordatorio', 'cargo_fijo', 'movimiento', 'meta_ingreso',
+    'comida', 'receta', 'articulo_super',
+  ]
   const resultados = await Promise.all(
     tablas.map(t => {
       const consulta = conexionNube.from(t).select('*').eq('hogar_id', p.hogarId)
@@ -205,24 +233,36 @@ export async function bajar(): Promise<void> {
     }),
   )
 
-  const conError = resultados.find(r => r.error)
-  if (conError?.error) {
+  // Si una tabla todavía no existe en la base, esa parte no se toca: vale más
+  // dejarla como está en el teléfono que borrarla por algo que falta allá.
+  const falla = resultados.find(r => r.error && !noExiste((r.error as { code?: string }).code ?? ''))
+  if (falla) {
     fijar('sin-señal', 'No pude bajar los cambios. Lo intento otra vez al rato.')
     return
   }
 
-  const [plantillas, tareas, eventos, recordatorios, cargos, movimientos, metas] =
-    resultados.map(r => (r.data ?? []) as Fila[])
+  const filasDe = (i: number): Fila[] | null => {
+    const r = resultados[i]
+    if (r.error) { sinTabla.add(tablas[i]); return null }
+    sinTabla.delete(tablas[i])
+    return (r.data ?? []) as Fila[]
+  }
+  const [plantillas, tareas, eventos, recordatorios, cargos, movimientos, metas, comidas, recetas, superFilas] =
+    tablas.map((_, i) => filasDe(i))
 
-  aplicarDeLaNube({
-    plantillas: plantillas.map(f => filaAPlantilla(f, p.mapa)),
-    tareas: tareas.map(f => filaATarea(f, p.mapa)),
-    eventos: eventos.map(f => filaAEvento(f, p.mapa)),
-    recordatorios: recordatorios.map(f => filaARecordatorio(f, p.mapa)),
-    cargosFijos: cargos.map(f => filaACargo(f, p.mapa)),
-    movimientos: movimientos.map(f => filaAMovimiento(f, p.mapa)),
-    metas: metas.map(f => filaAMeta(f, p.mapa)),
-  })
+  const parcial: Partial<Estado> = {}
+  if (plantillas) parcial.plantillas = plantillas.map(f => filaAPlantilla(f, p.mapa))
+  if (tareas) parcial.tareas = tareas.map(f => filaATarea(f, p.mapa))
+  if (eventos) parcial.eventos = eventos.map(f => filaAEvento(f, p.mapa))
+  if (recordatorios) parcial.recordatorios = recordatorios.map(f => filaARecordatorio(f, p.mapa))
+  if (cargos) parcial.cargosFijos = cargos.map(f => filaACargo(f, p.mapa))
+  if (movimientos) parcial.movimientos = movimientos.map(f => filaAMovimiento(f, p.mapa))
+  if (metas) parcial.metas = metas.map(f => filaAMeta(f, p.mapa))
+  if (comidas) parcial.comidas = comidas.map(f => filaAComida(f, p.mapa))
+  if (recetas) parcial.recetas = recetas.map(f => filaAReceta(f))
+  if (superFilas) parcial.super = superFilas.map(f => filaAItemSuper(f))
+
+  aplicarDeLaNube(parcial)
   fijar('listo')
 }
 
@@ -261,7 +301,8 @@ export async function subirLoDeAqui(): Promise<void> {
   volverIdsUuid()
   const vacio: Estado = {
     ...estadoActual(),
-    plantillas: [], tareas: [], eventos: [], recordatorios: [], cargosFijos: [], movimientos: [], metas: [],
+    plantillas: [], tareas: [], eventos: [], recordatorios: [], cargosFijos: [], movimientos: [],
+    metas: [], comidas: [], recetas: [], super: [],
   }
   encolar(diferencias(vacio, estadoActual(), perfil))
   await vaciarCola()
