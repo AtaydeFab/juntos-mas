@@ -1,7 +1,7 @@
 import { useRef, useState } from 'react'
 import { useEstado, cambiarYo, agregarRecordatorio, borrarRecordatorio, reiniciar, exportar, importar } from '../store'
 import { Avatar, SelectorMiembro } from '../componentes'
-import { useNube, olvidarNube, bajar, vaciarCola } from '../nube/sincronizacion'
+import { useNube, olvidarNube, bajar, subirLoDeAqui, vaciarCola } from '../nube/sincronizacion'
 import { salir } from '../nube/sesion'
 import { dejarDeUsarSoloLocal, usarSoloLocal } from './Entrar'
 import { hayNube } from '../nube/cliente'
@@ -89,9 +89,12 @@ export default function Mas() {
 
       <div className="panel">
         <span className="k">Empezar de cero</span>
-        <p className="nota">Borra lo palomeado y deja el machote como venía. Solo afecta este teléfono.</p>
+        <p className="nota">
+          Borra lo palomeado y deja el machote como venía. Si estás conectado a la casa, eso también
+          le llega a los demás.
+        </p>
         <button className="btn peligro" type="button"
-          onClick={() => { if (confirm('¿Borrar todo lo de este teléfono y dejar el machote como venía?')) reiniciar() }}>
+          onClick={() => { if (confirm('¿Borrar todo y dejar el machote como venía? Si hay casa, también se cambia allá.')) reiniciar() }}>
           Reiniciar
         </button>
       </div>
@@ -205,6 +208,13 @@ function LaNube() {
         onClick={() => void vaciarCola().then(() => bajar())}>
         Ponerse al día ahora
       </button>
+      <button className="btn fantasma" type="button"
+        onClick={() => { if (confirm('¿Mandar de nuevo todo lo de este teléfono a la casa?')) void subirLoDeAqui() }}>
+        Volver a subir lo de este teléfono
+      </button>
+      <p className="nota">
+        Esto último es por si la casa se ve vacía en los otros teléfonos: manda otra vez lo que hay aquí.
+      </p>
       <button className="btn peligro" type="button"
         onClick={async () => {
           if (!confirm('¿Cerrar la sesión en este teléfono?')) return

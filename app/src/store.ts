@@ -6,18 +6,27 @@ import { dia, desdeYmd, hoy, indiceSemana, lunesDe, semanaDe, sumarDias, ymd } f
 const LLAVE = 'juntos.v1'
 const VERSION = 1
 
+const id = () =>
+  typeof crypto !== 'undefined' && 'randomUUID' in crypto
+    ? crypto.randomUUID()
+    : `${Date.now().toString(16)}-${Math.random().toString(16).slice(2, 10)}`
+
+/**
+ * Lo que viene de fábrica nace con identificadores de verdad (UUID), no con
+ * nombres cortos: así la base los acepta tal cual cuando se suben a la casa.
+ */
 function inicial(): Estado {
   return {
     version: VERSION,
     yo: 'fa',
     vista: 'mias_y_ambos',
-    plantillas: PLANTILLAS,
+    plantillas: PLANTILLAS.map(p => ({ ...p, id: id() })),
     tareas: [],
     eventos: [],
-    recordatorios: RECORDATORIOS,
-    cargosFijos: CARGOS_FIJOS,
+    recordatorios: RECORDATORIOS.map(r => ({ ...r, id: id() })),
+    cargosFijos: CARGOS_FIJOS.map(c => ({ ...c, id: id() })),
     movimientos: [],
-    metas: METAS,
+    metas: METAS.map(m => ({ ...m, id: id() })),
   }
 }
 
@@ -79,11 +88,6 @@ export function useEstado(): Estado {
     () => estado,
   )
 }
-
-const id = () =>
-  typeof crypto !== 'undefined' && 'randomUUID' in crypto
-    ? crypto.randomUUID()
-    : `${Date.now().toString(16)}-${Math.random().toString(16).slice(2, 10)}`
 
 const esUuid = (v: string) => /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(v)
 
@@ -310,8 +314,14 @@ export function cambiarVista(vista: Vista) {
   guardar({ ...estado, vista })
 }
 
+/**
+ * Deja el machote como venía. Se conserva quién eres y la casa a la que estás
+ * conectado, para no quedarte fuera por hacer borrón y cuenta nueva; y como
+ * todo nace de nuevo, se sube a la casa igual que cualquier otro cambio.
+ */
 export function reiniciar() {
-  guardar(inicial())
+  guardar({ ...inicial(), yo: estado.yo, vista: estado.vista, nube: estado.nube })
+  materializarSemana(lunesDe(hoy()))
 }
 
 /** Todo lo de este teléfono en un archivo, para no depender de que el navegador no se limpie. */
